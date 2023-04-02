@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"user/internal/domain"
-	"user/internal/usecase"
+	"user/internal/app/domain"
+	"user/internal/app/usecase"
+	"user/pkg/response/fault"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,10 +23,10 @@ func GetUserCars(c echo.Context) error {
 	err = um.ValidationID()
 	if err != nil {
 		log.Println("GetUserCars ", err.Error())
-		// return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
 	}
 
-	response, err := usecase.GetUserCars(&um)
+	response, err := usecase.GetUserWithCar(&um)
 	if err != nil {
 		log.Println("GetUserCars ", err.Error())
 		return echo.ErrBadRequest

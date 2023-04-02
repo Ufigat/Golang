@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -16,7 +17,13 @@ func GetUserCars(c echo.Context) error {
 		log.Fatalln(err)
 	}
 
-	return c.JSON(http.StatusOK, resp)
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return c.JSON(http.StatusOK, string(body[:]))
 }
 
 // func GetUserEngines(c echo.Context) error {
