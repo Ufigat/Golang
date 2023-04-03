@@ -10,13 +10,13 @@ import (
 )
 
 func InitRoutes(e *echo.Echo) {
-	//ca := e.Group("/cars")
+	ca := e.Group("/cars")
 	//ca.GET("/car-engine", delivery.GetCarEngine)
-	//ca.GET("/cars-engines-brand", delivery.GetCarEngineByBrand)
+	ca.GET("/cars-engines-brand", delivery.GetCarEngineByBrand)
 
 	us := e.Group("/users")
 	us.GET("/user-cars", delivery.GetUserCars)
-	//us.GET("/user-engines", delivery.GetUserEngines)
+	us.GET("/user-engines", delivery.GetUserEngines)
 
 	showRotes(e)
 }

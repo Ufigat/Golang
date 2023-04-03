@@ -12,6 +12,7 @@ import (
 func InitRoutes(e *echo.Echo) {
 	//ca := e.Group("/cars")
 	e.GET("/user-cars", delivery.GetUserCars)
+	e.GET("/user-cars-engine", delivery.GetUserCarEngines)
 	//ca.GET("/cars-engines-brand", delivery.GetCarEngineByBrand)
 
 	// us := e.Group("/users")
