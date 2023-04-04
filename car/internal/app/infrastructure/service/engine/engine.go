@@ -14,11 +14,13 @@ import (
 func CarEngines(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.EngineResponse, error) {
 	value, err := json.Marshal(engineRequest)
 	if err != nil {
+		log.Println("CarEngines ", err.Error())
 		return nil, err
 	}
 
 	resp, err := http.Post("http://localhost:8082/engines", "application/json", bytes.NewBuffer(value))
 	if err != nil {
+		log.Println("CarEngines ", err.Error())
 		return nil, err
 	}
 
@@ -38,7 +40,7 @@ func CarEngines(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.Eng
 	var cers []engineRes.EngineResponse
 	err = json.NewDecoder(resp.Body).Decode(&cers)
 	if err != nil {
-		log.Println("CarEngine ", err.Error())
+		log.Println("CarEngines ", err.Error())
 		return nil, err
 	}
 
@@ -48,6 +50,7 @@ func CarEngines(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.Eng
 func CarEngine(engineRequest *engine.UserCarForEngineRequest) (*engineRes.EngineResponse, error) {
 	resp, err := http.Get(fmt.Sprint("http://localhost:8082/engine?id=", engineRequest.EngineID))
 	if err != nil {
+		log.Println("CarEngine ", err.Error())
 		return nil, err
 	}
 

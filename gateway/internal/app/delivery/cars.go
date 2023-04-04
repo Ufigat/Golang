@@ -24,7 +24,7 @@ func GetCarEnginesByBrand(c echo.Context) error {
 		var fault fault.FaultResponse
 		err = json.NewDecoder(resp.Body).Decode(&fault)
 		if err != nil {
-			log.Println("gateway - GetCarEngineByBrand ", err.Error())
+			log.Println("GetCarEngineByBrand ", err.Error())
 			return echo.ErrBadRequest
 		}
 
@@ -34,7 +34,7 @@ func GetCarEnginesByBrand(c echo.Context) error {
 	var crs car.CarBrandWithEngineResponse
 	err = json.NewDecoder(resp.Body).Decode(&crs)
 	if err != nil {
-		log.Println("gateway - GetUserEngines ", err.Error())
+		log.Println("GetUserEngines ", err.Error())
 		return echo.ErrBadRequest
 	}
 
@@ -64,7 +64,7 @@ func GetCarEngine(c echo.Context) error {
 	var crs car.CarWithEngineResponse
 	err = json.NewDecoder(resp.Body).Decode(&crs)
 	if err != nil {
-		log.Println("gateway - GetUserEngines ", err.Error())
+		log.Println("GetUserEngine ", err.Error())
 		return echo.ErrBadRequest
 	}
 

@@ -14,7 +14,8 @@ import (
 func GetCars(userModel *domain.User) ([]car.CarResponse, error) {
 	resp, err := http.Get(fmt.Sprint("http://localhost:8081/cars?id=", userModel.ID))
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("GetCars ", err.Error())
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -23,7 +24,7 @@ func GetCars(userModel *domain.User) ([]car.CarResponse, error) {
 		var fault fault.FaultResponse
 		err = json.NewDecoder(resp.Body).Decode(&fault)
 		if err != nil {
-			log.Println("gateway - GetCars ", err.Error())
+			log.Println("GetCars ", err.Error())
 			return nil, err
 		}
 
@@ -43,7 +44,8 @@ func GetCars(userModel *domain.User) ([]car.CarResponse, error) {
 func GetCarsWithEngine(userModel *domain.User) ([]engine.EngineResponse, error) {
 	resp, err := http.Get(fmt.Sprint("http://localhost:8081/car-user-engines?id=", userModel.ID))
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("GetCarsWithEngine ", err.Error())
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -52,7 +54,7 @@ func GetCarsWithEngine(userModel *domain.User) ([]engine.EngineResponse, error) 
 		var fault fault.FaultResponse
 		err = json.NewDecoder(resp.Body).Decode(&fault)
 		if err != nil {
-			log.Println("gateway - GetCars ", err.Error())
+			log.Println("GetCarsWithEngine ", err.Error())
 			return nil, err
 		}
 
@@ -62,7 +64,7 @@ func GetCarsWithEngine(userModel *domain.User) ([]engine.EngineResponse, error) 
 	var er []engine.EngineResponse
 	err = json.NewDecoder(resp.Body).Decode(&er)
 	if err != nil {
-		log.Println("GetCars ", err.Error())
+		log.Println("GetCarsWithEngine ", err.Error())
 		return nil, err
 	}
 
