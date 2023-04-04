@@ -1,8 +1,8 @@
 package main
 
 import (
+	"car/internal/app/routing"
 	database "car/pkg/postgres"
-	"car/routing"
 	"log"
 
 	"github.com/labstack/echo/v4"

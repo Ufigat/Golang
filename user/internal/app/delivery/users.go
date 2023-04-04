@@ -29,7 +29,7 @@ func GetUserCars(c echo.Context) error {
 	response, err := usecase.GetUserWithCar(&um)
 	if err != nil {
 		log.Println("GetUserCars ", err.Error())
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusUnprocessableEntity, err)
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -53,7 +53,7 @@ func GetUserCarEngines(c echo.Context) error {
 	response, err := usecase.GetUserWithCarEngines(&um)
 	if err != nil {
 		log.Println("GetUserCars after GetUserWithCarEngines", err.Error())
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusUnprocessableEntity, err)
 	}
 
 	return c.JSON(http.StatusOK, response)

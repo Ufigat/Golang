@@ -5,7 +5,7 @@ import (
 	"user/pkg/response/engine"
 )
 
-type UserResponse struct {
+type UserWithCarsResponse struct {
 	ID   int               `json:"id"`
 	Name string            `json:"name"`
 	Cars []car.CarResponse `json:"cars"`

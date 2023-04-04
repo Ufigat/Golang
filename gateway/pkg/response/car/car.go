@@ -8,8 +8,13 @@ type CarResponse struct {
 	Color string `json:"color"`
 }
 
-type CarResponseWithEngineByBrand struct {
+type CarBrandWithEngineResponse struct {
 	ID             int                     `json:"brand_id"`
 	Brand          string                  `json:"brand"`
 	EngineResponse []engine.EngineResponse `json:"engines"`
+}
+
+type CarWithEngineResponse struct {
+	ID             int                   `json:"car_id"`
+	EngineResponse engine.EngineResponse `json:"engine"`
 }

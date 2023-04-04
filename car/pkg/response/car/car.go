@@ -8,21 +8,37 @@ type CarResponse struct {
 	Color string `json:"color"`
 }
 
-type CarResponseWithEngineID struct {
-	ID       int    `json:"id,omitempty"`
-	Brand    string `json:"brand,omitempty"`
+type CarWithEngineIDResponse struct {
+	ID       int    `json:"id"`
+	Brand    string `json:"brand"`
 	EngineID int    `json:"engine_id"`
 }
 
-type CarResponseWithEngineByBrand struct {
+type CarIDWithEngineIDResponse struct {
+	ID       int `json:"id"`
+	EngineID int `json:"engine_id"`
+}
+
+type CarWithEngineByBrandResponse struct {
 	ID             int                     `json:"brand_id"`
 	Brand          string                  `json:"brand"`
 	EngineResponse []engine.EngineResponse `json:"engines"`
 }
 
-func NewCarResponseWithEngineByBrand(id int, brand string, engineResponse []engine.EngineResponse) *CarResponseWithEngineByBrand {
-	return &CarResponseWithEngineByBrand{
+func NewCarResponseWithEngineByBrand(id int, brand string, engineResponse []engine.EngineResponse) *CarWithEngineByBrandResponse {
+	return &CarWithEngineByBrandResponse{
 		ID:             id,
 		Brand:          brand,
 		EngineResponse: engineResponse}
+}
+
+type CarWithEngineResponse struct {
+	ID             int                   `json:"car_id"`
+	EngineResponse engine.EngineResponse `json:"engine"`
+}
+
+func NewCarWithEngineResponse(id int, engineResponse *engine.EngineResponse) *CarWithEngineResponse {
+	return &CarWithEngineResponse{
+		ID:             id,
+		EngineResponse: *engineResponse}
 }

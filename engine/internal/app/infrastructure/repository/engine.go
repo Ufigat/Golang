@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func GetEngines(er *engine.UserCarsForEngineRequest) ([]domain.Engine, error) {
+func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
 	rows, err := postgres.DB.Query(`
 	SELECT id as engine_id, engines.designation as designation
 		FROM engines
@@ -30,4 +30,16 @@ func GetEngines(er *engine.UserCarsForEngineRequest) ([]domain.Engine, error) {
 	}
 
 	return ens, nil
+}
+
+func GetEngine(er *domain.Engine) (*domain.Engine, error) {
+	var en domain.Engine
+	if err := postgres.DB.QueryRow(`
+	SELECT id as engine_id, engines.designation as designation
+		FROM engines
+	WHERE id = $1`, er.ID).Scan(&en.ID, &en.Designation); err != nil {
+		return nil, err
+	}
+
+	return &en, nil
 }

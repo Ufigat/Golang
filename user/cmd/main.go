@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
+	"user/internal/app/routing"
 	database "user/pkg/postgres"
-	"user/routing"
 
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"

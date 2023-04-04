@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"car/pkg/request/engine"
 	engineRes "car/pkg/response/engine"
+	"car/pkg/response/fault"
 	"encoding/json"
-	"io"
+	"fmt"
+	"log"
 	"net/http"
 )
 
-func GetCarEngine(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.EngineResponse, error) {
+func CarEngines(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.EngineResponse, error) {
 	value, err := json.Marshal(engineRequest)
 	if err != nil {
 		return nil, err
@@ -21,17 +23,53 @@ func GetCarEngine(engineRequest *engine.UserCarsForEngineRequest) ([]engineRes.E
 	}
 
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
 
-	if err != nil {
-		return nil, err
+	if resp.StatusCode > 399 {
+		var fault fault.FaultResponse
+		err = json.NewDecoder(resp.Body).Decode(&fault)
+		if err != nil {
+			log.Println("CarEngines ", err.Error())
+			return nil, err
+		}
+
+		return nil, &fault
 	}
 
 	var cers []engineRes.EngineResponse
-	err = json.Unmarshal(body, &cers)
+	err = json.NewDecoder(resp.Body).Decode(&cers)
 	if err != nil {
+		log.Println("CarEngine ", err.Error())
 		return nil, err
 	}
 
 	return cers, nil
+}
+
+func CarEngine(engineRequest *engine.UserCarForEngineRequest) (*engineRes.EngineResponse, error) {
+	resp, err := http.Get(fmt.Sprint("http://localhost:8082/engine?id=", engineRequest.EngineID))
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode > 399 {
+		var fault fault.FaultResponse
+		err = json.NewDecoder(resp.Body).Decode(&fault)
+		if err != nil {
+			log.Println("CarEngine ", err.Error())
+			return nil, err
+		}
+
+		return nil, &fault
+	}
+
+	var cers engineRes.EngineResponse
+	err = json.NewDecoder(resp.Body).Decode(&cers)
+	if err != nil {
+		log.Println("CarEngine ", err.Error())
+		return nil, err
+	}
+
+	return &cers, nil
 }

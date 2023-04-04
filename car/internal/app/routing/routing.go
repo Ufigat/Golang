@@ -1,8 +1,6 @@
 package routing
 
 import (
-	// "gateway/internal/delivery"
-
 	"car/internal/app/delivery"
 	"encoding/json"
 	"fmt"
@@ -12,14 +10,12 @@ import (
 )
 
 func InitRoutes(e *echo.Echo) {
-	//ca := e.Group("/cars")
-	e.GET("/cars", delivery.GetUserCars)
-	e.GET("/car-engines", delivery.GetUserCarsWithEngines)
-	e.GET("/car-engines-brand", delivery.GetCarsWithEnginesByBrand)
+	e.GET("/cars", delivery.GetCars)
+	e.GET("/car-user-engines", delivery.GetUserCarsWithEngines)
 
-	// us := e.Group("/users")
-	// us.GET("/user-cars", delivery.GetUserCars)
-	//us.GET("/user-engines", delivery.GetUserEngines)
+	e.GET("/car-engines-brand", delivery.GetCarsWithEnginesByBrand)
+	e.GET("/car-engines", delivery.GetCarEngine)
+
 	showRotes(e)
 }
 

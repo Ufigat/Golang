@@ -11,24 +11,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GetUserCars(c echo.Context) error {
+func GetCars(c echo.Context) error {
 	userID, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetCars ", err.Error())
 		return echo.ErrBadRequest
 	}
 
 	var cm domain.Car
-	cm.ID = userID
-	err = cm.ValidationID()
+	cm.UserID = userID
+	err = cm.ValidationUserID()
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetCars ", err.Error())
 		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
 	}
 
 	response, err := usecase.GetUserWithCar(&cm)
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetCars ", err.Error())
 		return echo.ErrBadRequest
 	}
 
@@ -38,21 +38,21 @@ func GetUserCars(c echo.Context) error {
 func GetUserCarsWithEngines(c echo.Context) error {
 	userID, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetUserCarsWithEngines ", err.Error())
 		return echo.ErrBadRequest
 	}
 
 	var cm domain.Car
-	cm.ID = userID
-	err = cm.ValidationID()
+	cm.UserID = userID
+	err = cm.ValidationUserID()
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetUserCarsWithEngines ", err.Error())
 		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
 	}
 
 	response, err := usecase.GetUserWithCarWithEngines(&cm)
 	if err != nil {
-		log.Println("GetUserCars ", err.Error())
+		log.Println("GetUserCarsWithEngines ", err.Error())
 		return echo.ErrBadRequest
 	}
 
@@ -72,6 +72,30 @@ func GetCarsWithEnginesByBrand(c echo.Context) error {
 	response, err := usecase.GetCarWithEnginesByBrand(&cm)
 	if err != nil {
 		log.Println("GetCarsWithEnginesByBrand ", err.Error())
+		return echo.ErrBadRequest
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func GetCarEngine(c echo.Context) error {
+	carID, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		log.Println("GetCarEngine ", err.Error())
+		return echo.ErrBadRequest
+	}
+
+	var cm domain.Car
+	cm.ID = carID
+	err = cm.ValidationID()
+	if err != nil {
+		log.Println("GetCarEngine ", err.Error())
+		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+	}
+
+	response, err := usecase.GetCarEngine(&cm)
+	if err != nil {
+		log.Println("GetCarEngine ", err.Error())
 		return echo.ErrBadRequest
 	}
 

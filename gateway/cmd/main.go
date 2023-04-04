@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gateway/routing"
+	"gateway/internal/app/routing"
 
 	"github.com/labstack/echo/v4"
 )

@@ -7,14 +7,14 @@ import (
 	"car/pkg/response/car"
 )
 
-func GetUserWithCar(userModel *domain.Car) ([]car.CarResponse, error) {
+func GetCarByUser(carModel *domain.Car) ([]car.CarResponse, error) {
 	rows, err := postgres.DB.Query(`
 	Select cars.id as car_id, brands.name, colors.name
 	FROM  user_cars
 		LEFT JOIN cars on user_cars.car_id = cars.id
 		LEFT JOIN brands on cars.brand_id = brands.id
 		LEFT JOIN colors on cars.color_id = colors.id
-	WHERE user_cars.user_id = $1`, userModel.ID)
+	WHERE user_cars.user_id = $1`, carModel.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +33,12 @@ func GetUserWithCar(userModel *domain.Car) ([]car.CarResponse, error) {
 	return crs, nil
 }
 
-func GetUserWithCarAndEngineId(userModel *domain.Car) (*engine.UserCarsForEngineRequest, error) {
+func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.UserCarsForEngineRequest, error) {
 	rows, err := postgres.DB.Query(`
 	Select distinct(cars.engine_id)
 	FROM user_cars
 		LEFT JOIN cars on user_cars.car_id = cars.id
-	WHERE user_cars.user_id = $1`, userModel.ID)
+	WHERE user_cars.user_id = $1`, userModel.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,19 +57,19 @@ func GetUserWithCarAndEngineId(userModel *domain.Car) (*engine.UserCarsForEngine
 	return &ucfer, nil
 }
 
-func GetCarByBrand(userModel *domain.Car) ([]car.CarResponseWithEngineID, error) {
+func GetCarByBrand(carModel *domain.Car) ([]car.CarWithEngineIDResponse, error) {
 	rows, err := postgres.DB.Query(`
-	Select cars.brand_id, cars.engine_id, brands.name
+	Select distinct cars.brand_id, cars.engine_id, brands.name
 		FROM cars
 		Left JOIN brands on cars.brand_id = brands.id
-	WHERE brands.name = $1`, userModel.Brand)
+	WHERE brands.name = $1`, carModel.Brand)
 	if err != nil {
 		return nil, err
 	}
 
-	var crwes []car.CarResponseWithEngineID
+	var crwes []car.CarWithEngineIDResponse
 	for rows.Next() {
-		var crwe car.CarResponseWithEngineID
+		var crwe car.CarWithEngineIDResponse
 		err = rows.Scan(&crwe.ID, &crwe.EngineID, &crwe.Brand)
 		if err != nil {
 			return nil, err
@@ -79,4 +79,16 @@ func GetCarByBrand(userModel *domain.Car) ([]car.CarResponseWithEngineID, error)
 	}
 
 	return crwes, nil
+}
+
+func GetCarEngine(carModel *domain.Car) (*car.CarIDWithEngineIDResponse, error) {
+	var cr car.CarIDWithEngineIDResponse
+	if err := postgres.DB.QueryRow(`
+	SELECT cars.id as car_id, cars.engine_id
+		FROM cars
+	WHERE id = $1`, carModel.ID).Scan(&cr.ID, &cr.EngineID); err != nil {
+		return nil, err
+	}
+
+	return &cr, nil
 }

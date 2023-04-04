@@ -7,7 +7,7 @@ import (
 	"user/pkg/response/user"
 )
 
-func GetUserWithCar(userModel *domain.User) (*user.UserResponse, error) {
+func GetUserWithCar(userModel *domain.User) (*user.UserWithCarsResponse, error) {
 	uwcr, err := repository.GetUserWithCar(userModel)
 	if err != nil {
 		return nil, err
