@@ -6,14 +6,19 @@ import (
 	"user/pkg/response/user"
 )
 
-func GetUserWithCar(userModel *domain.User) (*user.UserWithCarsResponse, error) {
-	var ur user.UserWithCarsResponse
-	if err := postgres.DB.QueryRow(`
-	SELECT users.id, name
-		FROM users
-	WHERE id = $1`, userModel.ID).Scan(&ur.ID, &ur.Name); err != nil {
+func GetUser(userModel *domain.User) (*user.UserWithCarsResponse, error) {
+	query := `
+		SELECT users.id, name
+			FROM users
+		WHERE id = $1`
+
+	var userCarsResp user.UserWithCarsResponse
+
+	err := postgres.DB.QueryRow(query, userModel.ID).Scan(&userCarsResp.ID, &userCarsResp.Name)
+	if err != nil {
+
 		return nil, err
 	}
 
-	return &ur, nil
+	return &userCarsResp, nil
 }

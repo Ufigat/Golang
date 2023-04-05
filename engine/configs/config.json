@@ -3,5 +3,6 @@
     "port": 5431,
     "user": "postgres",
     "password": "password",
-    "dbname": "engine"
+    "dbname": "engine",
+    "appPort": ":8082"
 }

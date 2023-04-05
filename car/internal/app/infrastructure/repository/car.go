@@ -8,22 +8,26 @@ import (
 )
 
 func GetCarByUser(carModel *domain.Car) ([]car.CarResponse, error) {
-	rows, err := postgres.DB.Query(`
-	Select cars.id as car_id, brands.name, colors.name
-	FROM  user_cars
-		LEFT JOIN cars on user_cars.car_id = cars.id
-		LEFT JOIN brands on cars.brand_id = brands.id
-		LEFT JOIN colors on cars.color_id = colors.id
-	WHERE user_cars.user_id = $1`, carModel.UserID)
+	query := `
+		SELECT cars.id as car_id, brands.name, colors.name
+		FROM  user_cars
+			LEFT JOIN cars ON user_cars.car_id = cars.id
+			LEFT JOIN brands ON cars.brand_id = brands.id
+			LEFT JOIN colors ON cars.color_id = colors.id
+		WHERE user_cars.user_id = $1`
+
+	rows, err := postgres.DB.Query(query, carModel.UserID)
 	if err != nil {
 		return nil, err
 	}
 
 	var crs []car.CarResponse
+
 	for rows.Next() {
 		var cr car.CarResponse
 		err = rows.Scan(&cr.ID, &cr.Brand, &cr.Color)
 		if err != nil {
+
 			return nil, err
 		}
 
@@ -33,21 +37,26 @@ func GetCarByUser(carModel *domain.Car) ([]car.CarResponse, error) {
 	return crs, nil
 }
 
-func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.UserCarsForEngineRequest, error) {
-	rows, err := postgres.DB.Query(`
-	Select distinct(cars.engine_id)
-	FROM user_cars
-		LEFT JOIN cars on user_cars.car_id = cars.id
-	WHERE user_cars.user_id = $1`, userModel.UserID)
+func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.EnginesRequest, error) {
+	query := `
+		SELECT distinct(cars.engine_id)
+		FROM user_cars
+			LEFT JOIN cars ON user_cars.car_id = cars.id
+		WHERE user_cars.user_id = $1`
+
+	rows, err := postgres.DB.Query(query, userModel.UserID)
 	if err != nil {
+
 		return nil, err
 	}
 
-	var ucfer engine.UserCarsForEngineRequest
+	var ucfer engine.EnginesRequest
+
 	for rows.Next() {
 		var engineID int
 		err = rows.Scan(&engineID)
 		if err != nil {
+
 			return nil, err
 		}
 
@@ -58,20 +67,25 @@ func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.UserCarsForEngine
 }
 
 func GetCarByBrand(carModel *domain.Car) ([]car.CarWithEngineIDResponse, error) {
-	rows, err := postgres.DB.Query(`
-	Select distinct cars.brand_id, cars.engine_id, brands.name
-		FROM cars
-		Left JOIN brands on cars.brand_id = brands.id
-	WHERE brands.name = $1`, carModel.Brand)
+	query := `
+		SELECT distinct cars.brand_id, cars.engine_id, brands.name
+			FROM cars
+			Left JOIN brands ON cars.brand_id = brands.id
+		WHERE brands.name = $1`
+
+	rows, err := postgres.DB.Query(query, carModel.Brand)
 	if err != nil {
+
 		return nil, err
 	}
 
 	var crwes []car.CarWithEngineIDResponse
+
 	for rows.Next() {
 		var crwe car.CarWithEngineIDResponse
 		err = rows.Scan(&crwe.ID, &crwe.EngineID, &crwe.Brand)
 		if err != nil {
+
 			return nil, err
 		}
 
@@ -82,11 +96,16 @@ func GetCarByBrand(carModel *domain.Car) ([]car.CarWithEngineIDResponse, error) 
 }
 
 func GetCarEngine(carModel *domain.Car) (*car.CarIDWithEngineIDResponse, error) {
+	query := `
+		SELECT cars.id as car_id, cars.engine_id
+			FROM cars
+		WHERE id = $1`
+
 	var cr car.CarIDWithEngineIDResponse
-	if err := postgres.DB.QueryRow(`
-	SELECT cars.id as car_id, cars.engine_id
-		FROM cars
-	WHERE id = $1`, carModel.ID).Scan(&cr.ID, &cr.EngineID); err != nil {
+
+	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&cr.ID, &cr.EngineID)
+	if err != nil {
+
 		return nil, err
 	}
 

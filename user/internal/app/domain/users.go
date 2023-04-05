@@ -10,6 +10,7 @@ type User struct {
 
 func (u *User) ValidationID() error {
 	if u.ID <= 0 {
+
 		return errors.New("field id is not valid")
 	}
 

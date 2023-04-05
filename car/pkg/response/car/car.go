@@ -29,7 +29,8 @@ func NewCarResponseWithEngineByBrand(id int, brand string, engineResponse []engi
 	return &CarWithEngineByBrandResponse{
 		ID:             id,
 		Brand:          brand,
-		EngineResponse: engineResponse}
+		EngineResponse: engineResponse,
+	}
 }
 
 type CarWithEngineResponse struct {
@@ -40,5 +41,6 @@ type CarWithEngineResponse struct {
 func NewCarWithEngineResponse(id int, engineResponse *engine.EngineResponse) *CarWithEngineResponse {
 	return &CarWithEngineResponse{
 		ID:             id,
-		EngineResponse: *engineResponse}
+		EngineResponse: *engineResponse,
+	}
 }

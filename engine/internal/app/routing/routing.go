@@ -3,10 +3,9 @@ package routing
 import (
 	"encoding/json"
 	"engine/internal/app/delivery"
-	"fmt"
-	"log"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 func InitRoutes(e *echo.Echo) {
@@ -19,8 +18,8 @@ func InitRoutes(e *echo.Echo) {
 func showRotes(e *echo.Echo) {
 	data, err := json.MarshalIndent(e.Routes(), "", "  ")
 	if err != nil {
-		log.Println("fatal error parsing routes")
+		logrus.Fatal("fatal error parsing routes")
 	}
 
-	fmt.Println(string(data))
+	logrus.Infoln(string(data))
 }

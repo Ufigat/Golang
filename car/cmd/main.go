@@ -3,9 +3,9 @@ package main
 import (
 	"car/internal/app/routing"
 	database "car/pkg/postgres"
-	"log"
 
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -14,6 +14,7 @@ func init() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("fatal config connect error: %s", err.Error())
@@ -29,5 +30,5 @@ func main() {
 	e := echo.New()
 	routing.InitRoutes(e)
 
-	e.Logger.Fatal(e.Start(":8081"))
+	e.Logger.Fatal(e.Start(viper.GetString("appPort")))
 }

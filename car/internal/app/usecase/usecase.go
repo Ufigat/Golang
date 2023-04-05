@@ -42,7 +42,7 @@ func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.CarWithEngineByBrandRe
 		return car.NewCarResponseWithEngineByBrand(0, "", nil), nil
 	}
 
-	var uwers engineReq.UserCarsForEngineRequest
+	var uwers engineReq.EnginesRequest
 	for _, cbr := range cbrs {
 		uwers.EngineIDs = append(uwers.EngineIDs, cbr.EngineID)
 	}
@@ -61,7 +61,7 @@ func GetCarEngine(carModel *domain.Car) (*car.CarWithEngineResponse, error) {
 		return nil, err
 	}
 
-	var uwers engineReq.UserCarForEngineRequest
+	var uwers engineReq.EngineRequest
 	uwers.EngineID = crwe.EngineID
 	cer, err := engine.CarEngine(&uwers)
 	if err != nil {

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.user_cars (
     FOREIGN KEY (car_id) REFERENCES cars(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_user_cars_cars
+CREATE INDEX IF NOT EXISTS idx1_user_cars
 ON public.user_cars (car_id);
 
 

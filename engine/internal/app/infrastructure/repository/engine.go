@@ -9,16 +9,19 @@ import (
 )
 
 func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
-	rows, err := postgres.DB.Query(`
-	SELECT id as engine_id, engines.designation as designation
-		FROM engines
-	WHERE id = any($1)`, pq.Array(er.EngineID))
+	query := `
+		SELECT id as engine_id, engines.designation as designation
+			FROM engines
+		WHERE id = any($1)`
+
+	rows, err := postgres.DB.Query(query, pq.Array(er.EngineID))
 
 	if err != nil {
 		return nil, err
 	}
 
 	var ens []domain.Engine
+
 	for rows.Next() {
 		var en domain.Engine
 		err = rows.Scan(&en.ID, &en.Designation)
@@ -33,11 +36,14 @@ func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
 }
 
 func GetEngine(er *domain.Engine) (*domain.Engine, error) {
+	query := `
+		SELECT id as engine_id, engines.designation as designation
+			FROM engines
+		WHERE id = $1`
+
 	var en domain.Engine
-	if err := postgres.DB.QueryRow(`
-	SELECT id as engine_id, engines.designation as designation
-		FROM engines
-	WHERE id = $1`, er.ID).Scan(&en.ID, &en.Designation); err != nil {
+
+	if err := postgres.DB.QueryRow(query, er.ID).Scan(&en.ID, &en.Designation); err != nil {
 		return nil, err
 	}
 

@@ -1,35 +1,37 @@
 package delivery
 
 import (
-	"encoding/json"
 	"engine/internal/app/domain"
 	"engine/internal/app/usecase"
 	"engine/pkg/request/engine"
 	"engine/pkg/response/fault"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func PostEngineUserCars(c echo.Context) error {
 	var ucfer engine.UserCarsForEnginesRequest
-	err := json.NewDecoder(c.Request().Body).Decode(&ucfer)
+
+	err := c.Bind(&ucfer)
 	if err != nil {
-		log.Println("PostEngineUserCars ", err.Error())
+		log.Errorln("PostEngineUserCars ", err.Error())
+
 		return echo.ErrBadRequest
 	}
 
-	for _, Id := range ucfer.EngineID {
-		if Id <= 0 {
+	for i := range ucfer.EngineID {
+		if ucfer.EngineID[i] <= 0 {
 			return echo.ErrBadRequest
 		}
 	}
 
 	response, err := usecase.GetEngines(&ucfer)
 	if err != nil {
-		log.Println("PostEngineUserCars ", err.Error())
+		log.Errorln("PostEngineUserCars ", err.Error())
+
 		return echo.ErrBadRequest
 	}
 
@@ -39,7 +41,8 @@ func PostEngineUserCars(c echo.Context) error {
 func GetEngine(c echo.Context) error {
 	engineID, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
-		log.Println("GetEngine", err.Error())
+		log.Errorln("GetEngine", err.Error())
+
 		return echo.ErrBadRequest
 	}
 
@@ -47,13 +50,15 @@ func GetEngine(c echo.Context) error {
 	em.ID = engineID
 	err = em.ValidationID()
 	if err != nil {
-		log.Println("GetEngine ", err.Error())
+		log.Infoln("GetEngine ", err.Error())
+
 		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
 	}
 
 	response, err := usecase.GetEngine(&em)
 	if err != nil {
-		log.Println("GetEngine ", err.Error())
+		log.Errorln("GetEngine ", err.Error())
+
 		return echo.ErrBadRequest
 	}
 

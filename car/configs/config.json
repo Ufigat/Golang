@@ -3,5 +3,7 @@
     "port": 5431,
     "user": "postgres",
     "password": "password",
-    "dbname": "car"
+    "dbname": "car",
+    "appPort": ":8081",
+    "engineService": "http://localhost:8082"
 }

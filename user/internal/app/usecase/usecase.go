@@ -8,31 +8,35 @@ import (
 )
 
 func GetUserWithCar(userModel *domain.User) (*user.UserWithCarsResponse, error) {
-	uwcr, err := repository.GetUserWithCar(userModel)
+	user, err := repository.GetUser(userModel)
 	if err != nil {
+
 		return nil, err
 	}
 
 	gcs, err := car.GetCars(userModel)
 	if err != nil {
+
 		return nil, err
 	}
 
-	uwcr.Cars = gcs
+	user.Cars = gcs
 
-	return uwcr, nil
+	return user, nil
 }
 
 func GetUserWithCarEngines(userModel *domain.User) (*user.UserEnginesResponse, error) {
-	uwcr, err := repository.GetUserWithCar(userModel)
+	users, err := repository.GetUser(userModel)
 	if err != nil {
+
 		return nil, err
 	}
 
-	gcwe, err := car.GetCarsWithEngine(userModel)
+	linkEngines, err := car.GetCarsWithEngine(userModel)
 	if err != nil {
+
 		return nil, err
 	}
 
-	return user.NewUserEnginesResponse(uwcr.ID, uwcr.Name, gcwe), nil
+	return user.NewUserEnginesResponse(users.ID, users.Name, linkEngines), nil
 }

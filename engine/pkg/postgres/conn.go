@@ -3,7 +3,8 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
@@ -27,7 +28,7 @@ func ConnectDB() error {
 		return err
 	}
 
-	log.Println("Successfully connected DB!")
+	log.Infoln("Successfully connected DB!")
 
 	return nil
 }

@@ -3,18 +3,19 @@ package routing
 import (
 	"car/internal/app/delivery"
 	"encoding/json"
-	"fmt"
-	"log"
 
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func InitRoutes(e *echo.Echo) {
 	e.GET("/cars", delivery.GetCars)
-	e.GET("/car-user-engines", delivery.GetUserCarsWithEngines)
 
-	e.GET("/car-engines-brand", delivery.GetCarsWithEnginesByBrand)
-	e.GET("/car-engines", delivery.GetCarEngine)
+	ca := e.Group("/car/")
+	ca.GET("user-engines", delivery.GetUserCarsWithEngines)
+
+	ca.GET("engines-brand", delivery.GetCarsWithEnginesByBrand)
+	ca.GET("engines", delivery.GetCarEngine)
 
 	showRotes(e)
 }
@@ -22,8 +23,8 @@ func InitRoutes(e *echo.Echo) {
 func showRotes(e *echo.Echo) {
 	data, err := json.MarshalIndent(e.Routes(), "", "  ")
 	if err != nil {
-		log.Println("fatal error parsing routes")
+		log.Fatal("fatal error parsing routes")
 	}
 
-	fmt.Println(string(data))
+	log.Infoln(string(data))
 }
