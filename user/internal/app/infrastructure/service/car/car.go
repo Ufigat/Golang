@@ -40,7 +40,7 @@ func GetCars(userModel *domain.User) (*car.DataResponse, error) {
 	return &carResp, nil
 }
 
-func GetCarsWithEngine(userModel *domain.User) (*engine.LinksResponse, error) {
+func GetCarsWithEngine(userModel *domain.User) (*engine.DataResponse, error) {
 	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/user-engines?id=", userModel.ID))
 	if err != nil {
 		log.Errorln("GetCarsWithEngine ", err.Error())
@@ -50,20 +50,18 @@ func GetCarsWithEngine(userModel *domain.User) (*engine.LinksResponse, error) {
 
 	defer resp.Body.Close()
 
-	var engineRespLinks engine.LinksResponse
+	var carResp engine.DataResponse
 
-	err = json.NewDecoder(resp.Body).Decode(&engineRespLinks)
+	err = json.NewDecoder(resp.Body).Decode(&carResp)
 	if err != nil {
 		log.Errorln("GetCarsWithEngine ", err.Error())
 
 		return nil, err
 	}
 
-	if engineRespLinks.Error != nil {
-		log.Errorln("CarEngines ", err.Error())
-
-		return nil, engineRespLinks.Error
+	if carResp.Error != "" {
+		return nil, &fault.Response{Message: carResp.Error}
 	}
 
-	return &engineRespLinks, nil
+	return &carResp, nil
 }

@@ -22,27 +22,27 @@ type EngineIDResponse struct {
 }
 
 type EngineByBrandResponse struct {
-	ID             int                   `json:"brand_id"`
-	Brand          string                `json:"brand"`
-	EngineResponse *engine.LinksResponse `json:"engines"`
+	ID             int                  `json:"brand_id"`
+	Brand          string               `json:"brand"`
+	EngineResponse *engine.DataResponse `json:"engines"`
 }
 
-func NewResponseWithEngineByBrand(id int, brand string, engineResponse *engine.LinksResponse) *EngineByBrandResponse {
-	return &EngineByBrandResponse{
-		ID:             id,
-		Brand:          brand,
-		EngineResponse: engineResponse,
-	}
-}
+// func NewResponseWithEngineByBrand(id int, brand string, engineResponse *engine.DataResponse) *EngineByBrandResponse {
+// 	return &EngineByBrandResponse{
+// 		ID:             id,
+// 		Brand:          brand,
+// 		EngineResponse: engineResponse,
+// 	}
+// }
 
-type EngineResponse struct {
-	ID             int                  `json:"car_id"`
-	EngineResponse *engine.DataResponse `json:"engine"`
-}
+// type EngineResponse struct {
+// 	ID             int                  `json:"car_id"`
+// 	EngineResponse *engine.DataResponse `json:"engine"`
+// }
 
-func NewEngineResponse(id int, engineResponse *engine.DataResponse) *EngineResponse {
-	return &EngineResponse{
-		ID:             id,
-		EngineResponse: engineResponse,
-	}
-}
+// func NewEngineResponse(id int, engineResponse *engine.DataResponse) *EngineResponse {
+// 	return &EngineResponse{
+// 		ID:             id,
+// 		EngineResponse: engineResponse,
+// 	}
+// }

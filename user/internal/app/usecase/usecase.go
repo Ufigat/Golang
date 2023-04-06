@@ -4,6 +4,7 @@ import (
 	"user/internal/app/domain"
 	"user/internal/app/infrastructure/repository"
 	"user/internal/app/infrastructure/service/car"
+	"user/pkg/response/engine"
 	"user/pkg/response/user"
 )
 
@@ -25,18 +26,20 @@ func GetUserWithCar(userModel *domain.User) (*user.CarsResponse, error) {
 	return user, nil
 }
 
-// func GetUserWithCarEngines(userModel *domain.User) (*user.EnginesResponse, error) {
-// 	users, err := repository.GetUser(userModel)
-// 	if err != nil {
+func GetUserWithCarEngines(userModel *domain.User) (*engine.LinksResponse, error) {
+	users, err := repository.GetUser(userModel)
+	if err != nil {
 
-// 		return nil, err
-// 	}
+		return nil, err
+	}
 
-// 	linkEngines, err := car.GetCarsWithEngine(userModel)
-// 	if err != nil {
+	linkEngines, err := car.GetCarsWithEngine(userModel)
+	if err != nil {
 
-// 		return nil, err
-// 	}
+		return nil, err
+	}
 
-// 	return user.NewEnginesResponse(users.ID, users.Name, linkEngines), nil
-// }
+	//fmt.Println(&engine.LinksResponse{users.ID, users.Name, linkEngines.Response})
+
+	return &engine.LinksResponse{ID: users.ID, Name: users.Name, Engine: linkEngines.Response}, nil
+}

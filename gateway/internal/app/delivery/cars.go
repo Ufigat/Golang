@@ -1,28 +1,36 @@
 package delivery
 
 import (
+	"encoding/json"
+	"fmt"
+	"gateway/pkg/util"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func GetCarEnginesByBrand(c echo.Context) error {
-	// resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines-brand?brand=", c.Param("brand")))
-	// if err != nil {
-	// 	log.Errorln("GetCarEnginesByBrand microservice error ", err.Error())
+	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines-brand?brand=", c.Param("brand")))
+	if err != nil {
+		log.Errorln("GetCarEnginesByBrand microservice error ", err.Error())
 
-	// 	return echo.ErrInternalServerError
-	// }
+		return echo.ErrInternalServerError
+	}
 
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 
-	// err = json.NewDecoder(resp.Body).Decode(&util.Response)
-	// if err != nil {
-	// 	log.Errorln("GetUserEngines ", err.Error())
+	var brandEngineResp util.Response
 
-	// 	return echo.ErrInternalServerError
-	// }
+	err = json.NewDecoder(resp.Body).Decode(&brandEngineResp)
+	if err != nil {
+		log.Errorln("GetUserEngines ", err.Error())
 
-	// return c.JSON(http.StatusOK, answer)
-	return nil
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, brandEngineResp)
 }
 
 func GetCarEngine(c echo.Context) error {

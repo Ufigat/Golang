@@ -5,7 +5,7 @@ import (
 )
 
 type CarsResponse struct {
-	ID   int            `json:"id,omitempty"`
-	Name string         `json:"name,omitempty"`
-	Cars []car.Response `json:"cars,omitempty"`
+	ID   int            `json:"id"`
+	Name string         `json:"name"`
+	Cars []car.Response `json:"cars"`
 }

@@ -1,18 +1,16 @@
 package engine
 
-import "car/pkg/response/fault"
-
 type Response struct {
 	ID          int    `json:"engine_id"`
 	Designation string `json:"designation"`
 }
 
-type DataResponse struct {
-	Engine Response        `json:"engine,omitempty"`
-	Error  *fault.Response `json:"error,omitempty"`
-}
+// type DataResponse struct {
+// 	Engine Response        `json:"engine"`
+// 	Error  *fault.Response `json:"error"`
+// }
 
-type LinksResponse struct {
-	Engines []Response      `json:"engines,omitempty"`
-	Error   *fault.Response `json:"error,omitempty"`
+type DataResponse struct {
+	Engines []Response `json:"data"`
+	Error   string     `json:"error"`
 }

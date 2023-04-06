@@ -6,11 +6,11 @@ import (
 )
 
 type Response struct {
-	Engine domain.Engine   `json:"engine,omitempty"`
-	Error  *fault.Response `json:"error,omitempty"`
+	Engine *domain.Engine  `json:"engine"`
+	Error  *fault.Response `json:"error"`
 }
 
 type LinksResponse struct {
-	Engines []domain.Engine `json:"engines,omitempty"`
-	Error   *fault.Response `json:"error,omitempty"`
+	Engines []domain.Engine `json:"engines"`
+	Error   *fault.Response `json:"error"`
 }

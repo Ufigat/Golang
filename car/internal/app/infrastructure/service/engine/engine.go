@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"car/pkg/request/engine"
 	engineRes "car/pkg/response/engine"
+	"car/pkg/response/fault"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,14 +13,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.LinksResponse, error) {
+func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.DataResponse, error) {
 	value, err := json.Marshal(engineRequest)
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
 
 		return nil, err
 	}
-
+	fmt.Println(fmt.Sprint(viper.GetString("engineService"), "/engines"))
+	fmt.Println(*engineRequest)
 	resp, err := http.Post(fmt.Sprint(viper.GetString("engineService"), "/engines"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
@@ -29,7 +31,7 @@ func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.LinksResponse,
 
 	defer resp.Body.Close()
 
-	var carEnigneRespLinks engineRes.LinksResponse
+	var carEnigneRespLinks engineRes.DataResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&carEnigneRespLinks)
 	if err != nil {
@@ -38,12 +40,13 @@ func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.LinksResponse,
 		return nil, err
 	}
 
-	if carEnigneRespLinks.Error != nil {
+	if carEnigneRespLinks.Error != "" {
 		log.Errorln("CarEngines ", err.Error())
 
-		return nil, carEnigneRespLinks.Error
+		return nil, &fault.Response{Message: carEnigneRespLinks.Error}
 	}
 
+	fmt.Println(carEnigneRespLinks)
 	return &carEnigneRespLinks, nil
 }
 
@@ -66,10 +69,10 @@ func CarEngine(engineRequest *engine.EngineRequest) (*engineRes.DataResponse, er
 		return nil, err
 	}
 
-	if dataResp.Error != nil {
-		log.Errorln("CarEngines ", err.Error())
+	if dataResp.Error != "" {
+		log.Errorln("CarEngine ", err.Error())
 
-		return nil, dataResp.Error
+		return nil, &fault.Response{Message: dataResp.Error}
 	}
 
 	return &dataResp, nil

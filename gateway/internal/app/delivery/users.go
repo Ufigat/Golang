@@ -40,24 +40,29 @@ func GetUserCars(c echo.Context) error {
 }
 
 func GetUserEngines(c echo.Context) error {
-	// resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars-engine?id=", c.Param("id")))
-	// if err != nil {
-	// 	log.Errorln("GetUserEngines ", err.Error())
+	resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars-engine?id=", c.Param("id")))
+	if err != nil {
+		log.Errorln("GetUserEngines ", err.Error())
 
-	// 	return echo.ErrInternalServerError
-	// }
+		return echo.ErrInternalServerError
+	}
 
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 
-	// var userEnginesResp user.EnginesResponse
+	var userEnginesResp util.Response
 
-	// err = json.NewDecoder(resp.Body).Decode(&userEnginesResp)
-	// if err != nil {
-	// 	log.Errorln("GetUserEngines ", err.Error())
+	err = json.NewDecoder(resp.Body).Decode(&userEnginesResp)
+	if err != nil {
+		log.Errorln("GetUserEngines ", err.Error())
 
-	// 	return echo.ErrInternalServerError
-	// }
+		return echo.ErrInternalServerError
+	}
 
-	// return c.JSON(http.StatusOK, userEnginesResp)
-	return nil
+	if userEnginesResp.Error != nil {
+		log.Errorln("GetUserCars ", userEnginesResp.Error)
+
+		return c.JSON(http.StatusUnprocessableEntity, userEnginesResp)
+	}
+
+	return c.JSON(http.StatusOK, userEnginesResp)
 }

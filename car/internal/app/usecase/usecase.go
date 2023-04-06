@@ -18,7 +18,7 @@ func GetUserWithCar(carModel *domain.Car) ([]car.Response, error) {
 	return crs, nil
 }
 
-func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.LinksResponse, error) {
+func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.DataResponse, error) {
 	uwers, err := repository.GetUserCarAndEngine(carModel)
 	if err != nil {
 		return nil, err
@@ -33,40 +33,41 @@ func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.LinksResponse, erro
 }
 
 func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.EngineByBrandResponse, error) {
-	cbrs, err := repository.GetCarByBrand(carModel)
+	carsByBrand, err := repository.GetCarByBrand(carModel)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(cbrs) == 0 {
-		return car.NewResponseWithEngineByBrand(0, "", nil), nil
+	if len(carsByBrand) == 0 {
+
+		return &car.EngineByBrandResponse{ID: carsByBrand[0].ID, Brand: carsByBrand[0].Brand}, nil
 	}
 
-	var uwers engineReq.EnginesRequest
-	for _, cbr := range cbrs {
-		uwers.EngineIDs = append(uwers.EngineIDs, cbr.EngineID)
+	var engineIDLinks engineReq.EnginesRequest
+	for _, cbr := range carsByBrand {
+		engineIDLinks.EngineIDs = append(engineIDLinks.EngineIDs, cbr.EngineID)
 	}
 
-	crs, err := engine.CarEngines(&uwers)
+	crs, err := engine.CarEngines(&engineIDLinks)
 	if err != nil {
 		return nil, err
 	}
 
-	return car.NewResponseWithEngineByBrand(cbrs[0].ID, cbrs[0].Brand, crs), nil
+	return &car.EngineByBrandResponse{ID: carsByBrand[0].ID, Brand: carsByBrand[0].Brand, EngineResponse: crs}, nil
 }
 
-func GetCarEngine(carModel *domain.Car) (*car.EngineResponse, error) {
-	crwe, err := repository.GetCarEngine(carModel)
-	if err != nil {
-		return nil, err
-	}
+// func GetCarEngine(carModel *domain.Car) (*car.EngineResponse, error) {
+// 	crwe, err := repository.GetCarEngine(carModel)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	var uwers engineReq.EngineRequest
-	uwers.EngineID = crwe.EngineID
-	cer, err := engine.CarEngine(&uwers)
-	if err != nil {
-		return nil, err
-	}
+// 	var uwers engineReq.EngineRequest
+// 	uwers.EngineID = crwe.EngineID
+// 	cer, err := engine.CarEngine(&uwers)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return car.NewEngineResponse(crwe.ID, cer), nil
-}
+// 	return car.NewEngineResponse(crwe.ID, cer), nil
+// }
