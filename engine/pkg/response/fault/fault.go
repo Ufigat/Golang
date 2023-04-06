@@ -1,9 +1,9 @@
 package fault
 
-type FaultResponse struct {
-	Message string `json:"message"`
+type Response struct {
+	Message string `json:"error"`
 }
 
-func NewFaultResponse(message string) *FaultResponse {
-	return &FaultResponse{Message: message}
+func NewResponse(message string) *Response {
+	return &Response{Message: message}
 }

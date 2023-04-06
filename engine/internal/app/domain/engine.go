@@ -1,6 +1,8 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+)
 
 type Engine struct {
 	ID          int    `json:"engine_id"`

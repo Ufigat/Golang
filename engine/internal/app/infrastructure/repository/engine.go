@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
+func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
 	query := `
 		SELECT id as engine_id, engines.designation as designation
 			FROM engines
@@ -20,7 +20,7 @@ func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
 		return nil, err
 	}
 
-	var ens []domain.Engine
+	var engineLinks []domain.Engine
 
 	for rows.Next() {
 		var en domain.Engine
@@ -29,10 +29,10 @@ func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
 			return nil, err
 		}
 
-		ens = append(ens, en)
+		engineLinks = append(engineLinks, en)
 	}
 
-	return ens, nil
+	return engineLinks, nil
 }
 
 func GetEngine(er *domain.Engine) (*domain.Engine, error) {
@@ -41,11 +41,11 @@ func GetEngine(er *domain.Engine) (*domain.Engine, error) {
 			FROM engines
 		WHERE id = $1`
 
-	var en domain.Engine
+	var engine domain.Engine
 
-	if err := postgres.DB.QueryRow(query, er.ID).Scan(&en.ID, &en.Designation); err != nil {
+	if err := postgres.DB.QueryRow(query, er.ID).Scan(&engine.ID, &engine.Designation); err != nil {
 		return nil, err
 	}
 
-	return &en, nil
+	return &engine, nil
 }

@@ -1,24 +1,29 @@
 package user
 
 import (
-	"gateway/pkg/response/car"
 	"gateway/pkg/response/engine"
+	"gateway/pkg/response/fault"
 )
 
-type UserCarsResponse struct {
-	ID   int               `json:"id"`
-	Name string            `json:"name"`
-	Cars []car.CarResponse `json:"cars"`
+type CarsResponse struct {
+	ID   int        `json:"id"`
+	Name string     `json:"name"`
+	Cars []Response `json:"cars"`
 }
 
-type UserEnginesResponse struct {
-	ID     int                     `json:"user_id"`
-	Name   string                  `json:"name"`
-	Engine []engine.EngineResponse `json:"engines"`
+type DataResponse struct {
+	Response *CarsResponse   `json:"cars"`
+	Error    *fault.Response `json:"error"`
 }
 
-type CarResponse struct {
+type Response struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
+}
+
+type EnginesResponse struct {
+	ID     int                     `json:"user_id"`
+	Name   string                  `json:"name"`
+	Engine []engine.EngineResponse `json:"engines"`
 }

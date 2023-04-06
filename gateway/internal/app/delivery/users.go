@@ -3,8 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"gateway/pkg/response/fault"
-	"gateway/pkg/response/user"
+	"gateway/pkg/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -22,19 +21,7 @@ func GetUserCars(c echo.Context) error {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("GetUserCars ", err.Error())
-
-			return echo.ErrInternalServerError
-		}
-
-		return c.JSON(resp.StatusCode, fault)
-	}
-
-	var userCarsResp user.UserCarsResponse
+	var userCarsResp util.Response
 
 	err = json.NewDecoder(resp.Body).Decode(&userCarsResp)
 	if err != nil {
@@ -43,40 +30,34 @@ func GetUserCars(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
+	if userCarsResp.Error != nil {
+		log.Errorln("GetUserCars ", userCarsResp.Error)
+
+		return c.JSON(http.StatusUnprocessableEntity, userCarsResp)
+	}
+
 	return c.JSON(http.StatusOK, userCarsResp)
 }
 
 func GetUserEngines(c echo.Context) error {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars-engine?id=", c.Param("id")))
-	if err != nil {
-		log.Errorln("GetUserEngines ", err.Error())
+	// resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars-engine?id=", c.Param("id")))
+	// if err != nil {
+	// 	log.Errorln("GetUserEngines ", err.Error())
 
-		return echo.ErrInternalServerError
-	}
+	// 	return echo.ErrInternalServerError
+	// }
 
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
+	// var userEnginesResp user.EnginesResponse
 
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("GetUserEngines ", err.Error())
+	// err = json.NewDecoder(resp.Body).Decode(&userEnginesResp)
+	// if err != nil {
+	// 	log.Errorln("GetUserEngines ", err.Error())
 
-			return echo.ErrInternalServerError
-		}
+	// 	return echo.ErrInternalServerError
+	// }
 
-		return c.JSON(resp.StatusCode, fault)
-	}
-
-	var userEnginesResp user.UserEnginesResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&userEnginesResp)
-	if err != nil {
-		log.Errorln("GetUserEngines ", err.Error())
-
-		return echo.ErrInternalServerError
-	}
-
-	return c.JSON(http.StatusOK, userEnginesResp)
+	// return c.JSON(http.StatusOK, userEnginesResp)
+	return nil
 }

@@ -1,9 +1,9 @@
 package engine
 
-type UserCarsForEnginesRequest struct {
+type IDsRequest struct {
 	EngineID []int `json:"engine_ids"`
 }
 
-type CarForEngineRequest struct {
+type Request struct {
 	EngineID int `json:"engine_id"`
 }

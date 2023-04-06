@@ -1,46 +1,48 @@
 package car
 
-import "car/pkg/response/engine"
+import (
+	"car/pkg/response/engine"
+)
 
-type CarResponse struct {
-	ID    int    `json:"id"`
-	Brand string `json:"name"`
-	Color string `json:"color"`
+type Response struct {
+	ID    int    `json:"id,omitempty"`
+	Brand string `json:"name,omitempty"`
+	Color string `json:"color,omitempty"`
 }
 
-type CarWithEngineIDResponse struct {
+type EngineIDBrandResponse struct {
 	ID       int    `json:"id"`
 	Brand    string `json:"brand"`
 	EngineID int    `json:"engine_id"`
 }
 
-type CarIDWithEngineIDResponse struct {
+type EngineIDResponse struct {
 	ID       int `json:"id"`
 	EngineID int `json:"engine_id"`
 }
 
-type CarWithEngineByBrandResponse struct {
-	ID             int                     `json:"brand_id"`
-	Brand          string                  `json:"brand"`
-	EngineResponse []engine.EngineResponse `json:"engines"`
+type EngineByBrandResponse struct {
+	ID             int                   `json:"brand_id"`
+	Brand          string                `json:"brand"`
+	EngineResponse *engine.LinksResponse `json:"engines"`
 }
 
-func NewCarResponseWithEngineByBrand(id int, brand string, engineResponse []engine.EngineResponse) *CarWithEngineByBrandResponse {
-	return &CarWithEngineByBrandResponse{
+func NewResponseWithEngineByBrand(id int, brand string, engineResponse *engine.LinksResponse) *EngineByBrandResponse {
+	return &EngineByBrandResponse{
 		ID:             id,
 		Brand:          brand,
 		EngineResponse: engineResponse,
 	}
 }
 
-type CarWithEngineResponse struct {
-	ID             int                   `json:"car_id"`
-	EngineResponse engine.EngineResponse `json:"engine"`
+type EngineResponse struct {
+	ID             int                  `json:"car_id"`
+	EngineResponse *engine.DataResponse `json:"engine"`
 }
 
-func NewCarWithEngineResponse(id int, engineResponse *engine.EngineResponse) *CarWithEngineResponse {
-	return &CarWithEngineResponse{
+func NewEngineResponse(id int, engineResponse *engine.DataResponse) *EngineResponse {
+	return &EngineResponse{
 		ID:             id,
-		EngineResponse: *engineResponse,
+		EngineResponse: engineResponse,
 	}
 }

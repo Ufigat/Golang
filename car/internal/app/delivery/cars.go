@@ -4,6 +4,7 @@ import (
 	"car/internal/app/domain"
 	"car/internal/app/usecase"
 	"car/pkg/response/fault"
+	"car/pkg/util"
 	"net/http"
 	"strconv"
 
@@ -13,29 +14,30 @@ import (
 
 func GetCars(c echo.Context) error {
 	userID, err := strconv.Atoi(c.QueryParam("id"))
+
 	if err != nil {
 		log.Errorln("GetCars ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Data: nil, Error: err.Error()})
 	}
 
-	var cm domain.Car
-	cm.UserID = userID
-	err = cm.ValidationUserID()
+	var car domain.Car
+	car.UserID = userID
+	err = car.ValidationUserID()
 	if err != nil {
 		log.Infoln("GetCars ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Data: nil, Error: err.Error()})
 	}
 
-	response, err := usecase.GetUserWithCar(&cm)
+	response, err := usecase.GetUserWithCar(&car)
 	if err != nil {
 		log.Errorln("GetCars ", err.Error())
 
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusBadRequest, &util.Response{Data: nil, Error: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusUnprocessableEntity, &util.Response{Data: response, Error: nil})
 }
 
 func GetUserCarsWithEngines(c echo.Context) error {
@@ -46,16 +48,16 @@ func GetUserCarsWithEngines(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	var cm domain.Car
-	cm.UserID = userID
-	err = cm.ValidationUserID()
+	var car domain.Car
+	car.UserID = userID
+	err = car.ValidationUserID()
 	if err != nil {
 		log.Infoln("GetUserCarsWithEngines ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, fault.NewResponse(err.Error()))
 	}
 
-	response, err := usecase.GetUserWithCarWithEngines(&cm)
+	response, err := usecase.GetUserWithCarEngines(&car)
 	if err != nil {
 		log.Errorln("GetUserCarsWithEngines ", err.Error())
 		return echo.ErrBadRequest
@@ -65,17 +67,17 @@ func GetUserCarsWithEngines(c echo.Context) error {
 }
 
 func GetCarsWithEnginesByBrand(c echo.Context) error {
-	var cm domain.Car
-	cm.Brand = c.QueryParam("brand")
+	var car domain.Car
+	car.Brand = c.QueryParam("brand")
 
-	err := cm.ValidationBrand()
+	err := car.ValidationBrand()
 	if err != nil {
 		log.Infoln("GetCarsWithEnginesByBrand ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, fault.NewResponse(err.Error()))
 	}
 
-	response, err := usecase.GetCarWithEnginesByBrand(&cm)
+	response, err := usecase.GetCarWithEnginesByBrand(&car)
 	if err != nil {
 		log.Errorln("GetCarsWithEnginesByBrand ", err.Error())
 
@@ -93,16 +95,16 @@ func GetCarEngine(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	var cm domain.Car
-	cm.ID = carID
-	err = cm.ValidationID()
+	var car domain.Car
+	car.ID = carID
+	err = car.ValidationID()
 	if err != nil {
 		log.Infoln("GetCarEngine ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, fault.NewResponse(err.Error()))
 	}
 
-	response, err := usecase.GetCarEngine(&cm)
+	response, err := usecase.GetCarEngine(&car)
 	if err != nil {
 		log.Errorln("GetCarEngine ", err.Error())
 

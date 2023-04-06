@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GetCars(userModel *domain.User) ([]car.CarResponse, error) {
+func GetCars(userModel *domain.User) (*car.DataResponse, error) {
 	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/cars?id=", userModel.ID))
 	if err != nil {
 		log.Errorln("GetCars ", err.Error())
@@ -24,32 +24,23 @@ func GetCars(userModel *domain.User) ([]car.CarResponse, error) {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
+	var carResp car.DataResponse
 
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("GetCars ", err.Error())
-
-			return nil, err
-		}
-
-		return nil, &fault
-	}
-
-	var crs []car.CarResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&crs)
+	err = json.NewDecoder(resp.Body).Decode(&carResp)
 	if err != nil {
 		log.Errorln("GetCars ", err.Error())
 
 		return nil, err
 	}
 
-	return crs, nil
+	if carResp.Error != "" {
+		return nil, &fault.Response{Message: carResp.Error}
+	}
+
+	return &carResp, nil
 }
 
-func GetCarsWithEngine(userModel *domain.User) ([]engine.EngineResponse, error) {
+func GetCarsWithEngine(userModel *domain.User) (*engine.LinksResponse, error) {
 	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/user-engines?id=", userModel.ID))
 	if err != nil {
 		log.Errorln("GetCarsWithEngine ", err.Error())
@@ -59,27 +50,20 @@ func GetCarsWithEngine(userModel *domain.User) ([]engine.EngineResponse, error) 
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
+	var engineRespLinks engine.LinksResponse
 
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("GetCarsWithEngine ", err.Error())
-
-			return nil, err
-		}
-
-		return nil, &fault
-	}
-
-	var er []engine.EngineResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&er)
+	err = json.NewDecoder(resp.Body).Decode(&engineRespLinks)
 	if err != nil {
 		log.Errorln("GetCarsWithEngine ", err.Error())
 
 		return nil, err
 	}
 
-	return er, nil
+	if engineRespLinks.Error != nil {
+		log.Errorln("CarEngines ", err.Error())
+
+		return nil, engineRespLinks.Error
+	}
+
+	return &engineRespLinks, nil
 }

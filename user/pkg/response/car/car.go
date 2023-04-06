@@ -1,15 +1,12 @@
 package car
 
-import "user/pkg/response/engine"
-
-type CarResponse struct {
+type Response struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
 
-type UserCarEnginesResponse struct {
-	ID     int                     `json:"id"`
-	Name   string                  `json:"name"`
-	Engine []engine.EngineResponse `json:"engines"`
+type DataResponse struct {
+	Response []Response `json:"data"`
+	Error    string     `json:"error"`
 }

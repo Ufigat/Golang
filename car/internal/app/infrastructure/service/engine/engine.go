@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"car/pkg/request/engine"
 	engineRes "car/pkg/response/engine"
-	"car/pkg/response/fault"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func CarEngines(engineRequest *engine.EnginesRequest) ([]engineRes.EngineResponse, error) {
+func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.LinksResponse, error) {
 	value, err := json.Marshal(engineRequest)
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
@@ -30,30 +29,25 @@ func CarEngines(engineRequest *engine.EnginesRequest) ([]engineRes.EngineRespons
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("CarEngines ", err.Error())
+	var carEnigneRespLinks engineRes.LinksResponse
 
-			return nil, err
-		}
-
-		return nil, &fault
-	}
-
-	var cers []engineRes.EngineResponse
-	err = json.NewDecoder(resp.Body).Decode(&cers)
+	err = json.NewDecoder(resp.Body).Decode(&carEnigneRespLinks)
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
 
 		return nil, err
 	}
 
-	return cers, nil
+	if carEnigneRespLinks.Error != nil {
+		log.Errorln("CarEngines ", err.Error())
+
+		return nil, carEnigneRespLinks.Error
+	}
+
+	return &carEnigneRespLinks, nil
 }
 
-func CarEngine(engineRequest *engine.EngineRequest) (*engineRes.EngineResponse, error) {
+func CarEngine(engineRequest *engine.EngineRequest) (*engineRes.DataResponse, error) {
 	resp, err := http.Get(fmt.Sprint(viper.GetString("engineService"), "/engine?id=", engineRequest.EngineID))
 	if err != nil {
 		log.Errorln("CarEngine ", err.Error())
@@ -63,25 +57,20 @@ func CarEngine(engineRequest *engine.EngineRequest) (*engineRes.EngineResponse, 
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode > 399 {
-		var fault fault.FaultResponse
-		err = json.NewDecoder(resp.Body).Decode(&fault)
-		if err != nil {
-			log.Errorln("CarEngine ", err.Error())
+	var dataResp engineRes.DataResponse
 
-			return nil, err
-		}
-
-		return nil, &fault
-	}
-
-	var cers engineRes.EngineResponse
-	err = json.NewDecoder(resp.Body).Decode(&cers)
+	err = json.NewDecoder(resp.Body).Decode(&dataResp)
 	if err != nil {
 		log.Errorln("CarEngine ", err.Error())
 
 		return nil, err
 	}
 
-	return &cers, nil
+	if dataResp.Error != nil {
+		log.Errorln("CarEngines ", err.Error())
+
+		return nil, dataResp.Error
+	}
+
+	return &dataResp, nil
 }

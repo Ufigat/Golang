@@ -7,7 +7,7 @@ import (
 	"car/pkg/response/car"
 )
 
-func GetCarByUser(carModel *domain.Car) ([]car.CarResponse, error) {
+func GetCarByUser(carModel *domain.Car) ([]car.Response, error) {
 	query := `
 		SELECT cars.id as car_id, brands.name, colors.name
 		FROM  user_cars
@@ -21,23 +21,23 @@ func GetCarByUser(carModel *domain.Car) ([]car.CarResponse, error) {
 		return nil, err
 	}
 
-	var crs []car.CarResponse
+	var carLinksResp []car.Response
 
 	for rows.Next() {
-		var cr car.CarResponse
-		err = rows.Scan(&cr.ID, &cr.Brand, &cr.Color)
+		var carResp car.Response
+		err = rows.Scan(&carResp.ID, &carResp.Brand, &carResp.Color)
 		if err != nil {
 
 			return nil, err
 		}
 
-		crs = append(crs, cr)
+		carLinksResp = append(carLinksResp, carResp)
 	}
 
-	return crs, nil
+	return carLinksResp, nil
 }
 
-func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.EnginesRequest, error) {
+func GetUserCarAndEngine(userModel *domain.Car) (*engine.EnginesRequest, error) {
 	query := `
 		SELECT distinct(cars.engine_id)
 		FROM user_cars
@@ -50,7 +50,7 @@ func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.EnginesRequest, e
 		return nil, err
 	}
 
-	var ucfer engine.EnginesRequest
+	var engineReg engine.EnginesRequest
 
 	for rows.Next() {
 		var engineID int
@@ -60,13 +60,13 @@ func GetCarWithUserAndEngineId(userModel *domain.Car) (*engine.EnginesRequest, e
 			return nil, err
 		}
 
-		ucfer.EngineIDs = append(ucfer.EngineIDs, engineID)
+		engineReg.EngineIDs = append(engineReg.EngineIDs, engineID)
 	}
 
-	return &ucfer, nil
+	return &engineReg, nil
 }
 
-func GetCarByBrand(carModel *domain.Car) ([]car.CarWithEngineIDResponse, error) {
+func GetCarByBrand(carModel *domain.Car) ([]car.EngineIDBrandResponse, error) {
 	query := `
 		SELECT distinct cars.brand_id, cars.engine_id, brands.name
 			FROM cars
@@ -79,35 +79,35 @@ func GetCarByBrand(carModel *domain.Car) ([]car.CarWithEngineIDResponse, error) 
 		return nil, err
 	}
 
-	var crwes []car.CarWithEngineIDResponse
+	var carEngineBrandRespLinks []car.EngineIDBrandResponse
 
 	for rows.Next() {
-		var crwe car.CarWithEngineIDResponse
-		err = rows.Scan(&crwe.ID, &crwe.EngineID, &crwe.Brand)
+		var carEngineResp car.EngineIDBrandResponse
+		err = rows.Scan(&carEngineResp.ID, &carEngineResp.EngineID, &carEngineResp.Brand)
 		if err != nil {
 
 			return nil, err
 		}
 
-		crwes = append(crwes, crwe)
+		carEngineBrandRespLinks = append(carEngineBrandRespLinks, carEngineResp)
 	}
 
-	return crwes, nil
+	return carEngineBrandRespLinks, nil
 }
 
-func GetCarEngine(carModel *domain.Car) (*car.CarIDWithEngineIDResponse, error) {
+func GetCarEngine(carModel *domain.Car) (*car.EngineIDResponse, error) {
 	query := `
 		SELECT cars.id as car_id, cars.engine_id
 			FROM cars
 		WHERE id = $1`
 
-	var cr car.CarIDWithEngineIDResponse
+	var carEngineResp car.EngineIDResponse
 
-	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&cr.ID, &cr.EngineID)
+	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&carEngineResp.ID, &carEngineResp.EngineID)
 	if err != nil {
 
 		return nil, err
 	}
 
-	return &cr, nil
+	return &carEngineResp, nil
 }

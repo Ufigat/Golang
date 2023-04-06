@@ -4,7 +4,9 @@ import (
 	"engine/internal/app/domain"
 	"engine/internal/app/usecase"
 	"engine/pkg/request/engine"
+	engineResp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -13,29 +15,32 @@ import (
 )
 
 func PostEngineUserCars(c echo.Context) error {
-	var ucfer engine.UserCarsForEnginesRequest
+	var engineIdsReq engine.IDsRequest
 
-	err := c.Bind(&ucfer)
+	err := c.Bind(&engineIdsReq)
 	if err != nil {
 		log.Errorln("PostEngineUserCars ", err.Error())
 
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusBadRequest, &engineResp.LinksResponse{Error: fault.NewResponse(err.Error())})
 	}
 
-	for i := range ucfer.EngineID {
-		if ucfer.EngineID[i] <= 0 {
-			return echo.ErrBadRequest
+	for i := range engineIdsReq.EngineID {
+		fmt.Println("engineIdsReq engineIdsReq", engineIdsReq.EngineID[i], i)
+
+		if engineIdsReq.EngineID[i] <= 0 {
+
+			return c.JSON(http.StatusUnprocessableEntity, &engineResp.LinksResponse{Engines: nil, Error: fault.NewResponse("Id is not valid")})
 		}
 	}
 
-	response, err := usecase.GetEngines(&ucfer)
+	response, err := usecase.GetEngines(&engineIdsReq)
 	if err != nil {
 		log.Errorln("PostEngineUserCars ", err.Error())
 
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusInternalServerError, &engineResp.LinksResponse{Engines: response, Error: fault.NewResponse(err.Error())})
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, &engineResp.LinksResponse{Engines: response, Error: nil})
 }
 
 func GetEngine(c echo.Context) error {
@@ -43,23 +48,24 @@ func GetEngine(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetEngine", err.Error())
 
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusBadRequest, &engineResp.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	var em domain.Engine
-	em.ID = engineID
-	err = em.ValidationID()
+	var engineModel domain.Engine
+	engineModel.ID = engineID
+	err = engineModel.ValidationID()
+
 	if err != nil {
 		log.Infoln("GetEngine ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, fault.NewFaultResponse(err.Error()))
+		return c.JSON(http.StatusUnprocessableEntity, &engineResp.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	response, err := usecase.GetEngine(&em)
+	response, err := usecase.GetEngine(&engineModel)
 	if err != nil {
 		log.Errorln("GetEngine ", err.Error())
 
-		return echo.ErrBadRequest
+		return c.JSON(http.StatusInternalServerError, &engineResp.Response{Engine: *response, Error: fault.NewResponse(err.Error())})
 	}
 
 	return c.JSON(http.StatusOK, response)

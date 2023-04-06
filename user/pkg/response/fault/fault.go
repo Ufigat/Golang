@@ -1,13 +1,13 @@
 package fault
 
-type FaultResponse struct {
+type Response struct {
 	Message string `json:"message"`
 }
 
-func (fr *FaultResponse) Error() string {
+func (fr *Response) Error() string {
 	return fr.Message
 }
 
-func NewFaultResponse(message string) *FaultResponse {
-	return &FaultResponse{Message: message}
+func NewResponse(message string) *Response {
+	return &Response{Message: message}
 }

@@ -9,7 +9,7 @@ import (
 	engineRes "car/pkg/response/engine"
 )
 
-func GetUserWithCar(carModel *domain.Car) ([]car.CarResponse, error) {
+func GetUserWithCar(carModel *domain.Car) ([]car.Response, error) {
 	crs, err := repository.GetCarByUser(carModel)
 	if err != nil {
 		return nil, err
@@ -18,8 +18,8 @@ func GetUserWithCar(carModel *domain.Car) ([]car.CarResponse, error) {
 	return crs, nil
 }
 
-func GetUserWithCarWithEngines(carModel *domain.Car) ([]engineRes.EngineResponse, error) {
-	uwers, err := repository.GetCarWithUserAndEngineId(carModel)
+func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.LinksResponse, error) {
+	uwers, err := repository.GetUserCarAndEngine(carModel)
 	if err != nil {
 		return nil, err
 	}
@@ -32,14 +32,14 @@ func GetUserWithCarWithEngines(carModel *domain.Car) ([]engineRes.EngineResponse
 	return crs, nil
 }
 
-func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.CarWithEngineByBrandResponse, error) {
+func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.EngineByBrandResponse, error) {
 	cbrs, err := repository.GetCarByBrand(carModel)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(cbrs) == 0 {
-		return car.NewCarResponseWithEngineByBrand(0, "", nil), nil
+		return car.NewResponseWithEngineByBrand(0, "", nil), nil
 	}
 
 	var uwers engineReq.EnginesRequest
@@ -52,10 +52,10 @@ func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.CarWithEngineByBrandRe
 		return nil, err
 	}
 
-	return car.NewCarResponseWithEngineByBrand(cbrs[0].ID, cbrs[0].Brand, crs), nil
+	return car.NewResponseWithEngineByBrand(cbrs[0].ID, cbrs[0].Brand, crs), nil
 }
 
-func GetCarEngine(carModel *domain.Car) (*car.CarWithEngineResponse, error) {
+func GetCarEngine(carModel *domain.Car) (*car.EngineResponse, error) {
 	crwe, err := repository.GetCarEngine(carModel)
 	if err != nil {
 		return nil, err
@@ -68,5 +68,5 @@ func GetCarEngine(carModel *domain.Car) (*car.CarWithEngineResponse, error) {
 		return nil, err
 	}
 
-	return car.NewCarWithEngineResponse(crwe.ID, cer), nil
+	return car.NewEngineResponse(crwe.ID, cer), nil
 }

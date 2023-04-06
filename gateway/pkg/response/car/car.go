@@ -1,20 +1,25 @@
 package car
 
-import "gateway/pkg/response/engine"
+import (
+	"gateway/pkg/response/engine"
+	"gateway/pkg/response/fault"
+)
 
-type CarResponse struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Color string `json:"color"`
-}
+// type Response struct {
+// 	ID            int                 `json:"id"`
+// 	Name          string              `json:"name"`
+// 	Color         string              `json:"color"`
+// 	FaultResponse fault.FaultResponse `json:"error"`
+// }
 
-type CarBrandWithEngineResponse struct {
+type BrandEngineResponse struct {
 	ID             int                     `json:"brand_id"`
 	Brand          string                  `json:"brand"`
 	EngineResponse []engine.EngineResponse `json:"engines"`
+	FaultResponse  fault.Response          `json:"error"`
 }
 
-type CarWithEngineResponse struct {
+type EngineResponse struct {
 	ID             int                   `json:"car_id"`
 	EngineResponse engine.EngineResponse `json:"engine"`
 }

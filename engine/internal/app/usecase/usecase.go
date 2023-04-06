@@ -6,7 +6,7 @@ import (
 	"engine/pkg/request/engine"
 )
 
-func GetEngines(er *engine.UserCarsForEnginesRequest) ([]domain.Engine, error) {
+func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
 	engines, err := repository.GetEngines(er)
 	if err != nil {
 		return nil, err
