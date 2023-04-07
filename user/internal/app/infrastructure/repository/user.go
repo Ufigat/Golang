@@ -6,19 +6,30 @@ import (
 	"user/pkg/response/user"
 )
 
-func GetUser(userModel *domain.User) (*user.CarsResponse, error) {
+func GetUser(userModel *domain.User) ([]user.CarsResponse, error) {
 	query := `
-		SELECT users.id, name
+		SELECT users.id, users.name, user_cars.car_id
 			FROM users
+		JOIN user_cars ON users.id = user_cars.user_id
 		WHERE id = $1`
 
-	var userCarsResp user.CarsResponse
+	var resp []user.CarsResponse
 
-	err := postgres.DB.QueryRow(query, userModel.ID).Scan(&userCarsResp.ID, &userCarsResp.Name)
+	rows, err := postgres.DB.Query(query, userModel.ID)
 	if err != nil {
-
 		return nil, err
 	}
 
-	return &userCarsResp, nil
+	for rows.Next() {
+		var elem user.CarsResponse
+
+		err = rows.Scan(&elem.ID, &elem.Name, &elem.CarID)
+		if err != nil {
+			return nil, err
+		}
+
+		resp = append(resp, elem)
+	}
+
+	return resp, nil
 }

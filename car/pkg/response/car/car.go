@@ -1,33 +1,30 @@
 package car
 
-import (
-	"car/pkg/response/engine"
-)
-
 type Response struct {
-	ID    int    `json:"id"`
-	Brand string `json:"name"`
-	Color string `json:"color"`
-}
-
-type EngineIDBrandResponse struct {
 	ID       int    `json:"id"`
-	Brand    string `json:"brand"`
-	EngineID int    `json:"engine_id"`
+	Brand    string `json:"name,omitempty"`
+	Color    string `json:"color,omitempty"`
+	EngineID int    `json:"engine_id,omitempty"`
 }
 
-type EngineIDResponse struct {
-	ID       int `json:"id"`
-	EngineID int `json:"engine_id"`
-}
+// type EngineIDBrandResponse struct {
+// 	ID       int    `json:"id"`
+// 	Brand    string `json:"brand"`
+// 	EngineID int    `json:"engine_id"`
+// }
 
-type EngineByBrandResponse struct {
-	ID             int               `json:"brand_id"`
-	Brand          string            `json:"brand"`
-	EngineResponse []engine.Response `json:"engines"`
-}
+// type EngineIDResponse struct {
+// 	ID       int `json:"id"`
+// 	EngineID int `json:"engine_id"`
+// }
 
-type EngineResponse struct {
-	ID      int              `json:"id"`
-	Engines *engine.Response `json:"engine"`
-}
+// type EngineByBrandResponse struct {
+// 	ID             int               `json:"brand_id"`
+// 	Brand          string            `json:"brand"`
+// 	EngineResponse []engine.Response `json:"engines"`
+// }
+
+// type EngineResponse struct {
+// 	ID      int              `json:"id"`
+// 	Engines *engine.Response `json:"engine"`
+// }

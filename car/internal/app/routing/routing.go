@@ -9,13 +9,14 @@ import (
 )
 
 func InitRoutes(e *echo.Echo) {
-	e.GET("/cars", delivery.GetCars)
+	ca := e.Group("/cars")
+	ca.POST("/", delivery.PostCars)
+	ca.POST("/engines", delivery.PostCarEngines)
+	// ca := e.Group("/car")
+	// ca.GET("/user-engines", delivery.GetUserCarsWithEngines)
 
-	ca := e.Group("/car/")
-	ca.GET("user-engines", delivery.GetUserCarsWithEngines)
-
-	ca.GET("engines-brand", delivery.GetCarsWithEnginesByBrand)
-	ca.GET("engines", delivery.GetCarEngine)
+	// ca.GET("/engines-brand", delivery.GetCarsWithEnginesByBrand)
+	// ca.GET("/engines", delivery.GetCarEngine)
 
 	showRotes(e)
 }

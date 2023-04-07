@@ -13,14 +13,14 @@ func InitRoutes(e *echo.Echo) {
 	us.GET("/cars", delivery.GetUserCars)
 	us.GET("/engines", delivery.GetUserEngines)
 
-	ca := e.Group("/cars/")
-	ca.GET(":id/engine", delivery.GetCarEngine)
-	ca.GET(":brand/engines-brand", delivery.GetCarEnginesByBrand)
+	ca := e.Group("/cars")
+	ca.GET("/:id/engine", delivery.GetCarEngine)
+	ca.GET("/:brand/engines-brand", delivery.GetCarEnginesByBrand)
 
-	showRotes(e)
+	showRoutes(e)
 }
 
-func showRotes(e *echo.Echo) {
+func showRoutes(e *echo.Echo) {
 	data, err := json.MarshalIndent(e.Routes(), "", "  ")
 	if err != nil {
 		log.Fatal("fatal error parsing routes")

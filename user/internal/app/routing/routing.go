@@ -9,9 +9,9 @@ import (
 )
 
 func InitRoutes(e *echo.Echo) {
-	us := e.Group("/user/")
-	us.GET("cars", delivery.GetUserCars)
-	us.GET("cars-engine", delivery.GetUserCarEngines)
+	us := e.Group("/user")
+	us.GET("/:id/cars", delivery.GetUserCars)
+	//us.GET("/cars-engine", delivery.GetUserCarEngines)
 
 	showRotes(e)
 }

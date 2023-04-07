@@ -1,23 +1,22 @@
 package repository
 
 import (
-	"car/internal/app/domain"
 	"car/pkg/postgres"
-	"car/pkg/request/engine"
+	carReq "car/pkg/request/car"
 	"car/pkg/response/car"
-	"car/pkg/response/fault"
+
+	"github.com/lib/pq"
 )
 
-func GetCarByUser(carModel *domain.Car) ([]car.Response, error) {
+func GetCarByUser(req *carReq.IDsRequest) ([]car.Response, error) {
 	query := `
-		SELECT cars.id as car_id, brands.name, colors.name
-		FROM  user_cars
-			LEFT JOIN cars ON user_cars.car_id = cars.id
-			LEFT JOIN brands ON cars.brand_id = brands.id
-			LEFT JOIN colors ON cars.color_id = colors.id
-		WHERE user_cars.user_id = $1`
+	SELECT cars.id, brands.name, colors.name
+		FROM cars
+		JOIN brands ON cars.brand_id = brands.id
+		JOIN colors ON cars.color_id = colors.id
+	WHERE cars.id =  any($1)`
 
-	rows, err := postgres.DB.Query(query, carModel.UserID)
+	rows, err := postgres.DB.Query(query, pq.Array(req.CarsIDs))
 	if err != nil {
 		return nil, err
 	}
@@ -38,82 +37,138 @@ func GetCarByUser(carModel *domain.Car) ([]car.Response, error) {
 	return carLinksResp, nil
 }
 
-func GetUserCarAndEngine(userModel *domain.Car) (*engine.EnginesRequest, error) {
+func GetCarEngineByUser(req *carReq.IDsRequest) ([]car.Response, error) {
 	query := `
-		SELECT distinct(cars.engine_id)
-		FROM user_cars
-			LEFT JOIN cars ON user_cars.car_id = cars.id
-		WHERE user_cars.user_id = $1`
+	SELECT cars.id, cars.engine_id
+		FROM cars
+		JOIN brands ON cars.brand_id = brands.id
+	WHERE cars.id =  any($1)`
 
-	rows, err := postgres.DB.Query(query, userModel.UserID)
+	rows, err := postgres.DB.Query(query, pq.Array(req.CarsIDs))
 	if err != nil {
-
 		return nil, err
 	}
 
-	var engineReg engine.EnginesRequest
+	var carLinksResp []car.Response
 
 	for rows.Next() {
-		var engineID int
-		err = rows.Scan(&engineID)
+		var carResp car.Response
+		err = rows.Scan(&carResp.ID, &carResp.EngineID)
 		if err != nil {
 
 			return nil, err
 		}
 
-		engineReg.EngineIDs = append(engineReg.EngineIDs, engineID)
+		carLinksResp = append(carLinksResp, carResp)
 	}
 
-	return &engineReg, nil
+	return carLinksResp, nil
 }
 
-func GetCarByBrand(carModel *domain.Car) ([]car.EngineIDBrandResponse, error) {
+func GetCarEngineByBrand(req *carReq.IDsRequest) ([]car.Response, error) {
 	query := `
-		SELECT distinct cars.brand_id, cars.engine_id, brands.name
-			FROM cars
-			Left JOIN brands ON cars.brand_id = brands.id
-		WHERE brands.name = $1`
+	SELECT cars.id, cars.engine_id
+		FROM cars
+		JOIN brands ON cars.brand_id = brands.id
+	WHERE brands.name = $1`
 
-	rows, err := postgres.DB.Query(query, carModel.Brand)
+	rows, err := postgres.DB.Query(query, pq.Array(req.CarsIDs))
 	if err != nil {
-
 		return nil, err
 	}
 
-	var carEngineBrandRespLinks []car.EngineIDBrandResponse
+	var carLinksResp []car.Response
 
 	for rows.Next() {
-		var carEngineResp car.EngineIDBrandResponse
-		err = rows.Scan(&carEngineResp.ID, &carEngineResp.EngineID, &carEngineResp.Brand)
+		var carResp car.Response
+		err = rows.Scan(&carResp.ID, &carResp.EngineID)
 		if err != nil {
 
 			return nil, err
 		}
 
-		carEngineBrandRespLinks = append(carEngineBrandRespLinks, carEngineResp)
+		carLinksResp = append(carLinksResp, carResp)
 	}
 
-	if len(carEngineBrandRespLinks) == 0 {
-
-		return nil, fault.NewResponse("no rows in result set")
-	}
-
-	return carEngineBrandRespLinks, nil
+	return carLinksResp, nil
 }
 
-func GetCarEngine(carModel *domain.Car) (*car.EngineIDResponse, error) {
-	query := `
-		SELECT cars.id as car_id, cars.engine_id
-			FROM cars
-		WHERE id = $1`
+// func GetUserCarAndEngine(userModel *domain.Car) (*engine.EnginesRequest, error) {
+// 	query := `
+// 		SELECT distinct(cars.engine_id)
+// 		FROM user_cars
+// 			LEFT JOIN cars ON user_cars.car_id = cars.id
+// 		WHERE user_cars.user_id = $1`
 
-	var carEngineResp car.EngineIDResponse
+// 	rows, err := postgres.DB.Query(query, userModel.UserID)
+// 	if err != nil {
 
-	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&carEngineResp.ID, &carEngineResp.EngineID)
-	if err != nil {
+// 		return nil, err
+// 	}
 
-		return nil, err
-	}
+// 	var engineReg engine.EnginesRequest
 
-	return &carEngineResp, nil
-}
+// 	for rows.Next() {
+// 		var engineID int
+// 		err = rows.Scan(&engineID)
+// 		if err != nil {
+
+// 			return nil, err
+// 		}
+
+// 		engineReg.EngineIDs = append(engineReg.EngineIDs, engineID)
+// 	}
+
+// 	return &engineReg, nil
+// }
+
+// func GetCarByBrand(carModel *domain.Car) ([]car.EngineIDBrandResponse, error) {
+// 	query := `
+// 		SELECT distinct cars.brand_id, cars.engine_id, brands.name
+// 			FROM cars
+// 			Left JOIN brands ON cars.brand_id = brands.id
+// 		WHERE brands.name = $1`
+
+// 	rows, err := postgres.DB.Query(query, carModel.Brand)
+// 	if err != nil {
+
+// 		return nil, err
+// 	}
+
+// 	var carEngineBrandRespLinks []car.EngineIDBrandResponse
+
+// 	for rows.Next() {
+// 		var carEngineResp car.EngineIDBrandResponse
+// 		err = rows.Scan(&carEngineResp.ID, &carEngineResp.EngineID, &carEngineResp.Brand)
+// 		if err != nil {
+
+// 			return nil, err
+// 		}
+
+// 		carEngineBrandRespLinks = append(carEngineBrandRespLinks, carEngineResp)
+// 	}
+
+// 	if len(carEngineBrandRespLinks) == 0 {
+
+// 		return nil, fault.NewResponse("no rows in result set")
+// 	}
+
+// 	return carEngineBrandRespLinks, nil
+// }
+
+// func GetCarEngine(carModel *domain.Car) (*car.EngineIDResponse, error) {
+// 	query := `
+// 		SELECT cars.id as car_id, cars.engine_id
+// 			FROM cars
+// 		WHERE id = $1`
+
+// 	var carEngineResp car.EngineIDResponse
+
+// 	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&carEngineResp.ID, &carEngineResp.EngineID)
+// 	if err != nil {
+
+// 		return nil, err
+// 	}
+
+// 	return &carEngineResp, nil
+// }

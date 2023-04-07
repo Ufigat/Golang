@@ -1,5 +1,6 @@
 {
     "appPort": ":8080",
     "carService": "http://localhost:8081",
+    "engineService": "http://localhost:8082",
     "userService": "http://localhost:8083"
 }

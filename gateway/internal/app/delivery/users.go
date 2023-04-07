@@ -1,69 +1,82 @@
 package delivery
 
 import (
-	"encoding/json"
-	"fmt"
+	"gateway/internal/app/service"
 	"gateway/pkg/response/fault"
+	"gateway/pkg/response/user"
 	"gateway/pkg/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 func GetUserCars(c echo.Context) error {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars?id=", c.Param("id")))
+	userDataResp, err := service.GetUser(c.Param("id"))
 	if err != nil {
-		log.Errorln("GetUserCars ", err.Error())
+		log.Errorln("GetUserCars #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	defer resp.Body.Close()
+	var carIDs []int
 
-	var userCarsResp util.Response
+	for i := range userDataResp.Data {
+		carIDs = append(carIDs, userDataResp.Data[i].CarID)
+	}
 
-	err = json.NewDecoder(resp.Body).Decode(&userCarsResp)
+	carDataResp, err := service.GetCars(carIDs)
 	if err != nil {
-		log.Errorln("GetUserCars ", err.Error())
+		log.Errorln("GetUserCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	if userCarsResp.Error != nil {
-		log.Errorln("GetUserCars ", userCarsResp.Error)
+	userCarsResp := &user.UserCarsResponse{
+		ID:   userDataResp.Data[0].ID,
+		Name: userDataResp.Data[0].Name,
+		Cars: carDataResp.Data}
 
-		return c.JSON(http.StatusUnprocessableEntity, userCarsResp)
-	}
-
-	return c.JSON(resp.StatusCode, userCarsResp)
+	return c.JSON(http.StatusOK, userCarsResp)
 }
 
 func GetUserEngines(c echo.Context) error {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/cars-engine?id=", c.Param("id")))
+	userDataResp, err := service.GetUser(c.Param("id"))
 	if err != nil {
-		log.Errorln("GetUserEngines ", err.Error())
+		log.Errorln("GetUserCars #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	defer resp.Body.Close()
+	var carIDs []int
+	for i := range userDataResp.Data {
+		carIDs = append(carIDs, userDataResp.Data[i].CarID)
+	}
 
-	var userEnginesResp util.Response
-
-	err = json.NewDecoder(resp.Body).Decode(&userEnginesResp)
+	carEngineDataResp, err := service.GetCarsEngine(carIDs)
 	if err != nil {
-		log.Errorln("GetUserEngines ", err.Error())
+		log.Errorln("GetUserCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	if userEnginesResp.Error != nil {
-		log.Errorln("GetUserCars ", userEnginesResp.Error)
+	var enginesIDs []int
 
-		return c.JSON(http.StatusUnprocessableEntity, userEnginesResp)
+	for i := range carEngineDataResp.Data {
+		enginesIDs = append(enginesIDs, carEngineDataResp.Data[i].EngineID)
 	}
 
-	return c.JSON(resp.StatusCode, userEnginesResp)
+	enginesResp, err := service.CarEngines(enginesIDs)
+	if err != nil {
+		log.Errorln("GetUserCars #2 ", err.Error())
+
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+	}
+
+	userEnginesResp := &user.UserEnginesResponse{
+		ID:      userDataResp.Data[0].ID,
+		Name:    userDataResp.Data[0].Name,
+		Engines: enginesResp.Data}
+
+	return c.JSON(http.StatusOK, userEnginesResp)
 }
