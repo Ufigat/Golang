@@ -5,6 +5,7 @@ import (
 	"car/pkg/postgres"
 	"car/pkg/request/engine"
 	"car/pkg/response/car"
+	"car/pkg/response/fault"
 )
 
 func GetCarByUser(carModel *domain.Car) ([]car.Response, error) {
@@ -90,6 +91,11 @@ func GetCarByBrand(carModel *domain.Car) ([]car.EngineIDBrandResponse, error) {
 		}
 
 		carEngineBrandRespLinks = append(carEngineBrandRespLinks, carEngineResp)
+	}
+
+	if len(carEngineBrandRespLinks) == 0 {
+
+		return nil, fault.NewResponse("no rows in result set")
 	}
 
 	return carEngineBrandRespLinks, nil

@@ -9,6 +9,7 @@ import (
 func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
 	engines, err := repository.GetEngines(er)
 	if err != nil {
+
 		return nil, err
 	}
 
@@ -16,10 +17,11 @@ func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
 }
 
 func GetEngine(er *domain.Engine) (*domain.Engine, error) {
-	engines, err := repository.GetEngine(er)
+	engine, err := repository.GetEngine(er)
 	if err != nil {
+
 		return nil, err
 	}
 
-	return engines, nil
+	return engine, nil
 }

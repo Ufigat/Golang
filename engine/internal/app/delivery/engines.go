@@ -7,7 +7,6 @@ import (
 	engineResp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
 	"engine/pkg/util"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,7 +16,6 @@ import (
 
 func PostEngineUserCars(c echo.Context) error {
 	var engineIdsReq engine.IDsRequest
-
 	err := c.Bind(&engineIdsReq)
 	if err != nil {
 		log.Errorln("PostEngineUserCars ", err.Error())
@@ -27,6 +25,7 @@ func PostEngineUserCars(c echo.Context) error {
 
 	for i := range engineIdsReq.EngineID {
 		if engineIdsReq.EngineID[i] <= 0 {
+
 			return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse("Id is not valid")})
 		}
 	}
@@ -37,8 +36,6 @@ func PostEngineUserCars(c echo.Context) error {
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
-
-	fmt.Println(&util.Response{Data: response})
 
 	return c.JSON(http.StatusOK, &util.Response{Data: response})
 }
@@ -54,7 +51,6 @@ func GetEngine(c echo.Context) error {
 	var engineModel domain.Engine
 	engineModel.ID = engineID
 	err = engineModel.ValidationID()
-
 	if err != nil {
 		log.Infoln("GetEngine ", err.Error())
 
@@ -68,5 +64,5 @@ func GetEngine(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &engineResp.Response{Engine: response, Error: fault.NewResponse(err.Error())})
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, &util.Response{Data: response})
 }

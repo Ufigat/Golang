@@ -3,6 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
+	"gateway/pkg/response/fault"
 	"gateway/pkg/util"
 	"net/http"
 
@@ -16,7 +17,7 @@ func GetUserCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserCars ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	defer resp.Body.Close()
@@ -27,7 +28,7 @@ func GetUserCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserCars ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	if userCarsResp.Error != nil {
@@ -36,7 +37,7 @@ func GetUserCars(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, userCarsResp)
 	}
 
-	return c.JSON(http.StatusOK, userCarsResp)
+	return c.JSON(resp.StatusCode, userCarsResp)
 }
 
 func GetUserEngines(c echo.Context) error {
@@ -44,7 +45,7 @@ func GetUserEngines(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserEngines ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	defer resp.Body.Close()
@@ -55,7 +56,7 @@ func GetUserEngines(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserEngines ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	if userEnginesResp.Error != nil {
@@ -64,5 +65,5 @@ func GetUserEngines(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, userEnginesResp)
 	}
 
-	return c.JSON(http.StatusOK, userEnginesResp)
+	return c.JSON(resp.StatusCode, userEnginesResp)
 }

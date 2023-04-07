@@ -13,15 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.DataResponse, error) {
+func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.DataResponses, error) {
 	value, err := json.Marshal(engineRequest)
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
 
 		return nil, err
 	}
-	fmt.Println(fmt.Sprint(viper.GetString("engineService"), "/engines"))
-	fmt.Println(*engineRequest)
+
 	resp, err := http.Post(fmt.Sprint(viper.GetString("engineService"), "/engines"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
 		log.Errorln("CarEngines ", err.Error())
@@ -31,7 +30,7 @@ func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.DataResponse, 
 
 	defer resp.Body.Close()
 
-	var carEnigneRespLinks engineRes.DataResponse
+	var carEnigneRespLinks engineRes.DataResponses
 
 	err = json.NewDecoder(resp.Body).Decode(&carEnigneRespLinks)
 	if err != nil {
@@ -46,11 +45,10 @@ func CarEngines(engineRequest *engine.EnginesRequest) (*engineRes.DataResponse, 
 		return nil, &fault.Response{Message: carEnigneRespLinks.Error}
 	}
 
-	fmt.Println(carEnigneRespLinks)
 	return &carEnigneRespLinks, nil
 }
 
-func CarEngine(engineRequest *engine.EngineRequest) (*engineRes.DataResponse, error) {
+func CarEngine(engineRequest *engine.Request) (*engineRes.DataResponse, error) {
 	resp, err := http.Get(fmt.Sprint(viper.GetString("engineService"), "/engine?id=", engineRequest.EngineID))
 	if err != nil {
 		log.Errorln("CarEngine ", err.Error())

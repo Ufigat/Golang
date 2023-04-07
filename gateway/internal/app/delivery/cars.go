@@ -30,28 +30,27 @@ func GetCarEnginesByBrand(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	return c.JSON(http.StatusOK, brandEngineResp)
+	return c.JSON(resp.StatusCode, brandEngineResp)
 }
 
 func GetCarEngine(c echo.Context) error {
-	// resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines?id=", c.Param("id")))
-	// if err != nil {
-	// 	log.Errorln("GetCarEngine microservice error", err.Error())
+	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines?id=", c.Param("id")))
+	if err != nil {
+		log.Errorln("GetCarEngine microservice error", err.Error())
 
-	// 	return echo.ErrInternalServerError
-	// }
+		return echo.ErrInternalServerError
+	}
 
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 
-	// var carEngineResp car.EngineResponse
+	var carEngineResp util.Response
 
-	// err = json.NewDecoder(resp.Body).Decode(&carEngineResp)
-	// if err != nil {
-	// 	log.Errorln("GetUserEngine ", err.Error())
+	err = json.NewDecoder(resp.Body).Decode(&carEngineResp)
+	if err != nil {
+		log.Errorln("GetUserEngine ", err.Error())
 
-	// 	return echo.ErrInternalServerError
-	// }
+		return echo.ErrInternalServerError
+	}
 
-	// return c.JSON(http.StatusOK, carEngineResp)
-	return nil
+	return c.JSON(resp.StatusCode, carEngineResp)
 }

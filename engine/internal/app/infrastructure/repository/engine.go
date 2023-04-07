@@ -4,6 +4,7 @@ import (
 	"engine/internal/app/domain"
 	"engine/pkg/postgres"
 	"engine/pkg/request/engine"
+	"engine/pkg/response/fault"
 
 	"github.com/lib/pq"
 )
@@ -30,6 +31,10 @@ func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
 		}
 
 		engineLinks = append(engineLinks, en)
+	}
+
+	if len(engineLinks) == 0 {
+		return nil, fault.NewResponse("no rows in result set")
 	}
 
 	return engineLinks, nil

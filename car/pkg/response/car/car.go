@@ -5,9 +5,9 @@ import (
 )
 
 type Response struct {
-	ID    int    `json:"id,omitempty"`
-	Brand string `json:"name,omitempty"`
-	Color string `json:"color,omitempty"`
+	ID    int    `json:"id"`
+	Brand string `json:"name"`
+	Color string `json:"color"`
 }
 
 type EngineIDBrandResponse struct {
@@ -22,27 +22,12 @@ type EngineIDResponse struct {
 }
 
 type EngineByBrandResponse struct {
-	ID             int                  `json:"brand_id"`
-	Brand          string               `json:"brand"`
-	EngineResponse *engine.DataResponse `json:"engines"`
+	ID             int               `json:"brand_id"`
+	Brand          string            `json:"brand"`
+	EngineResponse []engine.Response `json:"engines"`
 }
 
-// func NewResponseWithEngineByBrand(id int, brand string, engineResponse *engine.DataResponse) *EngineByBrandResponse {
-// 	return &EngineByBrandResponse{
-// 		ID:             id,
-// 		Brand:          brand,
-// 		EngineResponse: engineResponse,
-// 	}
-// }
-
-// type EngineResponse struct {
-// 	ID             int                  `json:"car_id"`
-// 	EngineResponse *engine.DataResponse `json:"engine"`
-// }
-
-// func NewEngineResponse(id int, engineResponse *engine.DataResponse) *EngineResponse {
-// 	return &EngineResponse{
-// 		ID:             id,
-// 		EngineResponse: engineResponse,
-// 	}
-// }
+type EngineResponse struct {
+	ID      int              `json:"id"`
+	Engines *engine.Response `json:"engine"`
+}

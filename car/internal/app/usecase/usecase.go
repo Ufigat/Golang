@@ -18,7 +18,7 @@ func GetUserWithCar(carModel *domain.Car) ([]car.Response, error) {
 	return crs, nil
 }
 
-func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.DataResponse, error) {
+func GetUserWithCarEngines(carModel *domain.Car) (*engineRes.DataResponses, error) {
 	uwers, err := repository.GetUserCarAndEngine(carModel)
 	if err != nil {
 		return nil, err
@@ -38,11 +38,6 @@ func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.EngineByBrandResponse,
 		return nil, err
 	}
 
-	if len(carsByBrand) == 0 {
-
-		return &car.EngineByBrandResponse{ID: carsByBrand[0].ID, Brand: carsByBrand[0].Brand}, nil
-	}
-
 	var engineIDLinks engineReq.EnginesRequest
 	for _, cbr := range carsByBrand {
 		engineIDLinks.EngineIDs = append(engineIDLinks.EngineIDs, cbr.EngineID)
@@ -53,21 +48,21 @@ func GetCarWithEnginesByBrand(carModel *domain.Car) (*car.EngineByBrandResponse,
 		return nil, err
 	}
 
-	return &car.EngineByBrandResponse{ID: carsByBrand[0].ID, Brand: carsByBrand[0].Brand, EngineResponse: crs}, nil
+	return &car.EngineByBrandResponse{ID: carsByBrand[0].ID, Brand: carsByBrand[0].Brand, EngineResponse: crs.Engines}, nil
 }
 
-// func GetCarEngine(carModel *domain.Car) (*car.EngineResponse, error) {
-// 	crwe, err := repository.GetCarEngine(carModel)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func GetCarEngine(carModel *domain.Car) (*car.EngineResponse, error) {
+	carEngine, err := repository.GetCarEngine(carModel)
+	if err != nil {
+		return nil, err
+	}
 
-// 	var uwers engineReq.EngineRequest
-// 	uwers.EngineID = crwe.EngineID
-// 	cer, err := engine.CarEngine(&uwers)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	var engineReq engineReq.Request
+	engineReq.EngineID = carEngine.EngineID
+	engineResp, err := engine.CarEngine(&engineReq)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return car.NewEngineResponse(crwe.ID, cer), nil
-// }
+	return &car.EngineResponse{ID: carEngine.ID, Engines: engineResp.Engines}, nil
+}

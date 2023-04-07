@@ -4,8 +4,8 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func (fr *Response) Error() string {
-	return fr.Message
+func (f *Response) Error() string {
+	return f.Message
 }
 
 func NewResponse(message string) *Response {

@@ -39,7 +39,5 @@ func GetUserWithCarEngines(userModel *domain.User) (*engine.LinksResponse, error
 		return nil, err
 	}
 
-	//fmt.Println(&engine.LinksResponse{users.ID, users.Name, linkEngines.Response})
-
 	return &engine.LinksResponse{ID: users.ID, Name: users.Name, Engine: linkEngines.Response}, nil
 }

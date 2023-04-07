@@ -15,7 +15,7 @@ func InitRoutes(e *echo.Echo) {
 	ca.GET("user-engines", delivery.GetUserCarsWithEngines)
 
 	ca.GET("engines-brand", delivery.GetCarsWithEnginesByBrand)
-	// ca.GET("engines", delivery.GetCarEngine)
+	ca.GET("engines", delivery.GetCarEngine)
 
 	showRotes(e)
 }
