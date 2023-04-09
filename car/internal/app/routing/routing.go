@@ -12,11 +12,8 @@ func InitRoutes(e *echo.Echo) {
 	ca := e.Group("/cars")
 	ca.POST("/", delivery.PostCars)
 	ca.POST("/engines", delivery.PostCarEngines)
-	// ca := e.Group("/car")
-	// ca.GET("/user-engines", delivery.GetUserCarsWithEngines)
-
-	// ca.GET("/engines-brand", delivery.GetCarsWithEnginesByBrand)
-	// ca.GET("/engines", delivery.GetCarEngine)
+	ca.GET("/:brand/engines-brand", delivery.GetCarsByBrand)
+	ca.GET("/engine/:id", delivery.GetCarEngine)
 
 	showRotes(e)
 }

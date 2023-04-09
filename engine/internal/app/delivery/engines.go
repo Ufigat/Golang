@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"engine/internal/app/domain"
-	"engine/internal/app/usecase"
+	"engine/internal/app/infrastructure/repository"
 	"engine/pkg/request/engine"
 	engineResp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
@@ -18,7 +18,7 @@ func PostEngineUserCars(c echo.Context) error {
 	var engineIdsReq engine.IDsRequest
 	err := c.Bind(&engineIdsReq)
 	if err != nil {
-		log.Errorln("PostEngineUserCars ", err.Error())
+		log.Errorln("PostEngineUserCars #1 ", err.Error())
 
 		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -30,9 +30,9 @@ func PostEngineUserCars(c echo.Context) error {
 		}
 	}
 
-	response, err := usecase.GetEngines(&engineIdsReq)
+	response, err := repository.GetEngines(&engineIdsReq)
 	if err != nil {
-		log.Errorln("PostEngineUserCars ", err.Error())
+		log.Errorln("PostEngineUserCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -43,23 +43,25 @@ func PostEngineUserCars(c echo.Context) error {
 func GetEngine(c echo.Context) error {
 	engineID, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
-		log.Errorln("GetEngine", err.Error())
+		log.Errorln("GetEngine #1 ", err.Error())
 
 		return c.JSON(http.StatusBadRequest, &engineResp.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	var engineModel domain.Engine
-	engineModel.ID = engineID
+	engineModel := &domain.Engine{
+		ID: engineID,
+	}
+
 	err = engineModel.ValidationID()
 	if err != nil {
-		log.Infoln("GetEngine ", err.Error())
+		log.Infoln("GetEngine #2 ", err.Error())
 
 		return c.JSON(http.StatusUnprocessableEntity, &engineResp.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	response, err := usecase.GetEngine(&engineModel)
+	response, err := repository.GetEngine(engineModel)
 	if err != nil {
-		log.Errorln("GetEngine ", err.Error())
+		log.Errorln("GetEngine #3 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &engineResp.Response{Engine: response, Error: fault.NewResponse(err.Error())})
 	}

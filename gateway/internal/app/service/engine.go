@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gateway/pkg/request/engine"
 	engineReq "gateway/pkg/request/engine"
 	engineRes "gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
@@ -51,8 +50,8 @@ func CarEngines(engineIDs []int) (*engineRes.DataResponse, error) {
 	return &carEnigneRespLinks, nil
 }
 
-func CarEngine(engineRequest *engine.Request) (*engineRes.DataResponse, error) {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("engineService"), "/engine?id=", engineRequest.EngineID))
+func CarEngine(engineId int) (*engineRes.EnigneResponse, error) {
+	resp, err := http.Get(fmt.Sprint(viper.GetString("engineService"), "/engine?id=", engineId))
 	if err != nil {
 		log.Errorln("CarEngine ", err.Error())
 
@@ -61,7 +60,7 @@ func CarEngine(engineRequest *engine.Request) (*engineRes.DataResponse, error) {
 
 	defer resp.Body.Close()
 
-	var dataResp engineRes.DataResponse
+	var dataResp engineRes.EnigneResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&dataResp)
 	if err != nil {

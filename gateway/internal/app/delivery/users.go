@@ -37,7 +37,7 @@ func GetUserCars(c echo.Context) error {
 		Name: userDataResp.Data[0].Name,
 		Cars: carDataResp.Data}
 
-	return c.JSON(http.StatusOK, userCarsResp)
+	return c.JSON(http.StatusOK, &util.Response{Data: userCarsResp})
 }
 
 func GetUserEngines(c echo.Context) error {
@@ -78,5 +78,5 @@ func GetUserEngines(c echo.Context) error {
 		Name:    userDataResp.Data[0].Name,
 		Engines: enginesResp.Data}
 
-	return c.JSON(http.StatusOK, userEnginesResp)
+	return c.JSON(http.StatusOK, &util.Response{Data: userEnginesResp})
 }

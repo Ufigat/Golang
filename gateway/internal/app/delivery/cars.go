@@ -1,56 +1,65 @@
 package delivery
 
 import (
-	"encoding/json"
-	"fmt"
+	"gateway/internal/app/service"
+	"gateway/pkg/response/car"
+	"gateway/pkg/response/engine"
+	"gateway/pkg/response/fault"
 	"gateway/pkg/util"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 func GetCarEnginesByBrand(c echo.Context) error {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines-brand?brand=", c.Param("brand")))
+	carResp, err := service.GetCarsEngineByBrand(c.Param("brand"))
 	if err != nil {
-		log.Errorln("GetCarEnginesByBrand microservice error ", err.Error())
+		log.Errorln("GetCarEnginesByBrand #1 ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	defer resp.Body.Close()
+	var engineIDs []int
 
-	var brandEngineResp util.Response
-
-	err = json.NewDecoder(resp.Body).Decode(&brandEngineResp)
-	if err != nil {
-		log.Errorln("GetUserEngines ", err.Error())
-
-		return echo.ErrInternalServerError
+	for i := range carResp.Data {
+		engineIDs = append(engineIDs, carResp.Data[i].EngineID)
 	}
 
-	return c.JSON(resp.StatusCode, brandEngineResp)
+	engineDataResp, err := service.CarEngines(engineIDs)
+	if err != nil {
+		log.Errorln("GetCarEnginesByBrand #2 ", err.Error())
+
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+	}
+
+	carEngineByBrandResp := &car.EngineByBrandResponse{
+		Name:    c.Param("brand"),
+		Engines: engineDataResp.Data,
+	}
+
+	return c.JSON(http.StatusOK, &util.Response{Data: carEngineByBrandResp})
 }
 
 func GetCarEngine(c echo.Context) error {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("carService"), "/car/engines?id=", c.Param("id")))
+	carResp, err := service.GetCar(c.Param("id"))
 	if err != nil {
-		log.Errorln("GetCarEngine microservice error", err.Error())
+		log.Errorln("GetCarEngine #1 ", err.Error())
 
 		return echo.ErrInternalServerError
 	}
 
-	defer resp.Body.Close()
-
-	var carEngineResp util.Response
-
-	err = json.NewDecoder(resp.Body).Decode(&carEngineResp)
+	engineResp, err := service.CarEngine(carResp.Data.EngineID)
 	if err != nil {
-		log.Errorln("GetUserEngine ", err.Error())
+		log.Errorln("GetCarEngine #1 ", err.Error())
 
 		return echo.ErrInternalServerError
 	}
 
-	return c.JSON(resp.StatusCode, carEngineResp)
+	resp := &engine.ForCar{
+		ID:     carResp.Data.ID,
+		Engine: engineResp.Data,
+	}
+
+	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }

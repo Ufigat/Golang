@@ -16,7 +16,6 @@ func GetUser(userID string) (*user.DataResponse, error) {
 	if err != nil {
 		log.Errorln("GetUserCars #1 ", err.Error())
 
-		//return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 		return nil, err
 	}
 
@@ -29,7 +28,6 @@ func GetUser(userID string) (*user.DataResponse, error) {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
 		return nil, err
-		//return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	return &resp, nil
