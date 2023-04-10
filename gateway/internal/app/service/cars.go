@@ -4,25 +4,28 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	carReq "gateway/pkg/request/car"
 	"gateway/pkg/response/car"
 	"gateway/pkg/response/fault"
 	"net/http"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func GetCars(carIDs []int) (*car.DataResponse, error) {
-	carIDsReq := &carReq.CarsRequest{CarsIDs: carIDs}
-	value, err := json.Marshal(carIDsReq)
+	value, err := json.Marshal(carIDs)
 	if err != nil {
 		log.Errorln("GetCars #1 ", err.Error())
 
 		return nil, err
 	}
 
-	carsResp, err := http.Post(fmt.Sprint(viper.GetString("services.car"), "/cars/"), "application/json", bytes.NewBuffer(value))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	carsResp, err := client.Post(fmt.Sprint(viper.GetString("services.car"), "/cars"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
 		log.Errorln("GetCars #2 ", err.Error())
 
@@ -50,15 +53,18 @@ func GetCars(carIDs []int) (*car.DataResponse, error) {
 }
 
 func GetCarsEngine(carIDs []int) (*car.DataResponse, error) {
-	carIDsReq := &carReq.CarsRequest{CarsIDs: carIDs}
-	value, err := json.Marshal(carIDsReq)
+	value, err := json.Marshal(carIDs)
 	if err != nil {
 		log.Errorln("GetCarsEngine #1 ", err.Error())
 
 		return nil, err
 	}
 
-	carResp, err := http.Post(fmt.Sprint(viper.GetString("services.car"), "/cars/engines"), "application/json", bytes.NewBuffer(value))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	carResp, err := client.Post(fmt.Sprint(viper.GetString("services.car"), "/cars/engines"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
 		log.Errorln("GetCarsEngine #2 ", err.Error())
 
@@ -86,7 +92,11 @@ func GetCarsEngine(carIDs []int) (*car.DataResponse, error) {
 }
 
 func GetCarsEngineByBrand(brand string) (*car.DataResponse, error) {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("services.car"), "/cars/", brand, "/engines-brand"))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(fmt.Sprint(viper.GetString("services.car"), "/cars/", brand, "/engines-brand"))
 	if err != nil {
 		log.Errorln("GetCarsEngineByBrand #1 ", err.Error())
 
@@ -114,7 +124,11 @@ func GetCarsEngineByBrand(brand string) (*car.DataResponse, error) {
 }
 
 func GetCar(carID string) (*car.CarEngineResponse, error) {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("services.car"), "/cars/", carID, "/engine"))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(fmt.Sprint(viper.GetString("services.car"), "/cars/", carID, "/engine"))
 	if err != nil {
 		log.Errorln("GetCar #1 ", err.Error())
 

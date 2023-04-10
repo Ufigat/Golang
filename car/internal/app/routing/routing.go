@@ -10,8 +10,8 @@ import (
 
 func InitRoutes(e *echo.Echo) {
 	ca := e.Group("/cars")
-	ca.POST("/", delivery.PostCars)
-	ca.POST("/engines", delivery.PostCarEngines)
+	ca.POST("", delivery.GetCars)
+	ca.POST("/engines", delivery.GetCarEngines)
 	ca.GET("/:brand/engines-brand", delivery.GetCarsByBrand)
 	ca.GET("/:id/engine", delivery.GetCarEngine)
 

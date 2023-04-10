@@ -13,18 +13,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func PostCars(c echo.Context) error {
-	var req carReq.IDsRequest
-	err := c.Bind(&req)
+func GetCars(c echo.Context) error {
+	var carsIDs []int
+	err := c.Bind(&carsIDs)
 	if err != nil {
-		log.Errorln("PostCars #1 ", err.Error())
+		log.Errorln("GetCars #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	resp, err := repository.GetCarByUser(&req)
+	resp, err := repository.GetCarByUser(carsIDs)
 	if err != nil {
-		log.Errorln("PostCars #2 ", err.Error())
+		log.Errorln("GetCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -32,18 +32,18 @@ func PostCars(c echo.Context) error {
 	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }
 
-func PostCarEngines(c echo.Context) error {
-	var req carReq.IDsRequest
-	err := c.Bind(&req)
+func GetCarEngines(c echo.Context) error {
+	var carsIDs []int
+	err := c.Bind(&carsIDs)
 	if err != nil {
-		log.Errorln("PostCars #1 ", err.Error())
+		log.Errorln("GetCarEngines #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	resp, err := repository.GetCarEngineByUser(&req)
+	resp, err := repository.GetCarEngineByUser(carsIDs)
 	if err != nil {
-		log.Errorln("PostCars #2 ", err.Error())
+		log.Errorln("GetCarEngines #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}

@@ -4,25 +4,28 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	engineReq "gateway/pkg/request/engine"
 	engineRes "gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
 	"net/http"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-func PostEngines(engineIDs []int) (*engineRes.DataResponse, error) {
-	engineIDsReq := &engineReq.EnginesRequest{EngineIDs: engineIDs}
-	value, err := json.Marshal(&engineIDsReq)
+func GetEngines(engineIDs []int) (*engineRes.DataResponse, error) {
+	value, err := json.Marshal(&engineIDs)
 	if err != nil {
 		log.Errorln("CarEngines #1 ", err.Error())
 
 		return nil, &fault.Response{Message: err.Error()}
 	}
 
-	resp, err := http.Post(fmt.Sprint(viper.GetString("services.engine"), "/engines"), "application/json", bytes.NewBuffer(value))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Post(fmt.Sprint(viper.GetString("services.engine"), "/engines"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
 		log.Errorln("CarEngines #2 ", err.Error())
 
@@ -50,7 +53,11 @@ func PostEngines(engineIDs []int) (*engineRes.DataResponse, error) {
 }
 
 func GetEngine(engineId int) (*engineRes.EnigneResponse, error) {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("services.engine"), "/engine?id=", engineId))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(fmt.Sprint(viper.GetString("services.engine"), "/engine?id=", engineId))
 	if err != nil {
 		log.Errorln("CarEngine #1 ", err.Error())
 

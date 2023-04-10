@@ -1,7 +1,6 @@
 package car
 
 import (
-	"gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
 )
 
@@ -15,11 +14,6 @@ type Response struct {
 type DataResponse struct {
 	Data  []Response      `json:"data"`
 	Error *fault.Response `json:"error"`
-}
-
-type EngineByBrandResponse struct {
-	Name    string            `json:"brand"`
-	Engines []engine.Response `json:"engines"`
 }
 
 type CarEngineResponse struct {

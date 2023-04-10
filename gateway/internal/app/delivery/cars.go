@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"gateway/internal/app/service"
-	"gateway/pkg/response/car"
 	"gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
 	"gateway/pkg/util"
@@ -26,15 +25,15 @@ func GetCarEnginesByBrand(c echo.Context) error {
 		engineIDs = append(engineIDs, carResp.Data[i].EngineID)
 	}
 
-	engineDataResp, err := service.PostEngines(engineIDs)
+	engineDataResp, err := service.GetEngines(engineIDs)
 	if err != nil {
 		log.Errorln("GetCarEnginesByBrand #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	carEngineByBrandResp := &car.EngineByBrandResponse{
-		Name:    c.Param("brand"),
+	carEngineByBrandResp := &engine.ByBrandResponse{
+		Brand:   c.Param("brand"),
 		Engines: engineDataResp.Data,
 	}
 

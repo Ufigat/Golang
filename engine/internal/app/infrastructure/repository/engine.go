@@ -2,29 +2,30 @@ package repository
 
 import (
 	"engine/pkg/postgres"
-	"engine/pkg/request/engine"
 	resp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
 
 	"github.com/lib/pq"
 )
 
-func GetEngines(req *engine.IDsRequest) ([]resp.Engine, error) {
+func GetEngines(reqIDs []int) ([]resp.Engine, error) {
 	query := `
-		SELECT id as engine_id, engines.designation as designation
+		SELECT id, designation
 			FROM engines
 		WHERE id = any($1)`
 
-	rows, err := postgres.DB.Query(query, pq.Array(req.EngineID))
-
+	rows, err := postgres.DB.Query(query, pq.Array(reqIDs))
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	var respLinks []resp.Engine
 
 	for rows.Next() {
 		var resp resp.Engine
+
 		err = rows.Scan(&resp.ID, &resp.Designation)
 		if err != nil {
 			return nil, err
@@ -40,15 +41,15 @@ func GetEngines(req *engine.IDsRequest) ([]resp.Engine, error) {
 	return respLinks, nil
 }
 
-func GetEngine(req *engine.Request) (*resp.Engine, error) {
+func GetEngine(engineID int) (*resp.Engine, error) {
 	query := `
-		SELECT id as engine_id, engines.designation as designation
+		SELECT id, designation
 			FROM engines
 		WHERE id = $1`
 
 	var resp resp.Engine
 
-	if err := postgres.DB.QueryRow(query, req.ID).Scan(&resp.ID, &resp.Designation); err != nil {
+	if err := postgres.DB.QueryRow(query, engineID).Scan(&resp.ID, &resp.Designation); err != nil {
 		return nil, err
 	}
 

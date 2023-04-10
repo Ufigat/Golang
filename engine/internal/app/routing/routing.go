@@ -9,7 +9,7 @@ import (
 )
 
 func InitRoutes(e *echo.Echo) {
-	e.POST("/engines", delivery.PostEngineUserCars)
+	e.POST("/engines", delivery.GetEngines)
 	e.GET("/engine", delivery.GetEngine)
 
 	showRoutes(e)

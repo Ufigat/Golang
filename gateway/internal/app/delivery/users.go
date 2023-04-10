@@ -19,22 +19,17 @@ func GetUserCars(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	var carIDs []int
-
-	for i := range userDataResp.Data {
-		carIDs = append(carIDs, userDataResp.Data[i].CarID)
-	}
-
-	carDataResp, err := service.GetCars(carIDs)
+	carDataResp, err := service.GetCars(userDataResp.Data.CarIDs)
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
 	}
 
 	userCarsResp := &user.UserCarsResponse{
-		ID:   userDataResp.Data[0].ID,
-		Name: userDataResp.Data[0].Name,
-		Cars: carDataResp.Data}
+		ID:   userDataResp.Data.ID,
+		Name: userDataResp.Data.Name,
+		Cars: carDataResp.Data,
+	}
 
 	return c.JSON(http.StatusOK, &util.Response{Data: userCarsResp})
 }
@@ -47,12 +42,7 @@ func GetUserEngines(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	var carIDs []int
-	for i := range userDataResp.Data {
-		carIDs = append(carIDs, userDataResp.Data[i].CarID)
-	}
-
-	carEngineDataResp, err := service.GetCarsEngine(carIDs)
+	carEngineDataResp, err := service.GetCarsEngine(userDataResp.Data.CarIDs)
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
@@ -65,7 +55,7 @@ func GetUserEngines(c echo.Context) error {
 		enginesIDs = append(enginesIDs, carEngineDataResp.Data[i].EngineID)
 	}
 
-	enginesResp, err := service.PostEngines(enginesIDs)
+	enginesResp, err := service.GetEngines(enginesIDs)
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
@@ -73,9 +63,10 @@ func GetUserEngines(c echo.Context) error {
 	}
 
 	userEnginesResp := &user.UserEnginesResponse{
-		ID:      userDataResp.Data[0].ID,
-		Name:    userDataResp.Data[0].Name,
-		Engines: enginesResp.Data}
+		ID:      userDataResp.Data.ID,
+		Name:    userDataResp.Data.Name,
+		Engines: enginesResp.Data,
+	}
 
 	return c.JSON(http.StatusOK, &util.Response{Data: userEnginesResp})
 }

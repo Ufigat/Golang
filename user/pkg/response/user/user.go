@@ -1,7 +1,7 @@
 package user
 
 type Response struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	CarID int    `json:"car_id"`
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	CarIDs []int64 `json:"car_ids"`
 }

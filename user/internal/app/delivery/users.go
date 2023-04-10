@@ -21,18 +21,14 @@ func GetUserCars(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	user := &user.Request{
-		ID: userID,
-	}
-
-	err = user.ValidationID()
+	err = user.ValidationID(userID)
 	if err != nil {
 		log.Infoln("GetUserCars #2", err.Error())
 
 		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	resp, err := repository.GetUser(user)
+	resp, err := repository.GetUser(userID)
 	if err != nil {
 		log.Infoln("GetUserCars #3", err.Error())
 

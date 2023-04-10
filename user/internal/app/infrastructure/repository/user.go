@@ -2,34 +2,25 @@ package repository
 
 import (
 	"user/pkg/postgres"
-	"user/pkg/request/user"
 	res "user/pkg/response/user"
+
+	"github.com/lib/pq"
 )
 
-func GetUser(req *user.Request) ([]res.Response, error) {
+func GetUser(userID int) (*res.Response, error) {
 	query := `
-		SELECT users.id, users.name, user_cars.car_id
+		SELECT users.id, users.name, array_agg(user_cars.car_id) as car_ids
 			FROM users
 		JOIN user_cars ON users.id = user_cars.user_id
-		WHERE id = $1`
+		WHERE id = $1
+		GROUP BY users.id, users.name`
 
-	var userLinks []res.Response
+	var resp res.Response
 
-	rows, err := postgres.DB.Query(query, req.ID)
+	err := postgres.DB.QueryRow(query, userID).Scan(&resp.ID, &resp.Name, pq.Array(&resp.CarIDs))
 	if err != nil {
 		return nil, err
 	}
 
-	for rows.Next() {
-		var elem res.Response
-
-		err = rows.Scan(&elem.ID, &elem.Name, &elem.CarID)
-		if err != nil {
-			return nil, err
-		}
-
-		userLinks = append(userLinks, elem)
-	}
-
-	return userLinks, nil
+	return &resp, nil
 }

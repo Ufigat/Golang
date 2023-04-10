@@ -26,3 +26,8 @@ type ForCarResponse struct {
 	Data  *ForCar         `json:"data"`
 	Error *fault.Response `json:"error"`
 }
+
+type ByBrandResponse struct {
+	Brand   string     `json:"brand"`
+	Engines []Response `json:"engines"`
+}

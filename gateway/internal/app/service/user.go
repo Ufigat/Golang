@@ -6,13 +6,18 @@ import (
 	"gateway/pkg/response/fault"
 	"gateway/pkg/response/user"
 	"net/http"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func GetUser(userID string) (*user.DataResponse, error) {
-	httpResp, err := http.Get(fmt.Sprint(viper.GetString("services.user"), "/user/", userID, "/cars"))
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	httpResp, err := client.Get(fmt.Sprint(viper.GetString("services.user"), "/user/", userID, "/cars"))
 	if err != nil {
 		log.Errorln("GetUserCars #1 ", err.Error())
 

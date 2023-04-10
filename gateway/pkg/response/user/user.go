@@ -19,12 +19,12 @@ type UserEnginesResponse struct {
 }
 
 type Response struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	CarID int    `json:"car_id"`
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	CarIDs []int  `json:"car_ids"`
 }
 
 type DataResponse struct {
-	Data  []Response      `json:"data"`
+	Data  Response        `json:"data"`
 	Error *fault.Response `json:"error"`
 }
