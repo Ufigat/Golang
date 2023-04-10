@@ -1,35 +1,35 @@
 package repository
 
 import (
-	"user/internal/app/domain"
 	"user/pkg/postgres"
-	"user/pkg/response/user"
+	"user/pkg/request/user"
+	res "user/pkg/response/user"
 )
 
-func GetUser(userModel *domain.User) ([]user.Response, error) {
+func GetUser(req *user.Request) ([]res.Response, error) {
 	query := `
 		SELECT users.id, users.name, user_cars.car_id
 			FROM users
 		JOIN user_cars ON users.id = user_cars.user_id
 		WHERE id = $1`
 
-	var resp []user.Response
+	var userLinks []res.Response
 
-	rows, err := postgres.DB.Query(query, userModel.ID)
+	rows, err := postgres.DB.Query(query, req.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		var elem user.Response
+		var elem res.Response
 
 		err = rows.Scan(&elem.ID, &elem.Name, &elem.CarID)
 		if err != nil {
 			return nil, err
 		}
 
-		resp = append(resp, elem)
+		userLinks = append(userLinks, elem)
 	}
 
-	return resp, nil
+	return userLinks, nil
 }

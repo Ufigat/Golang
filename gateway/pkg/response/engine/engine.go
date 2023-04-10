@@ -1,18 +1,20 @@
 package engine
 
+import "gateway/pkg/response/fault"
+
 type Response struct {
 	ID          int    `json:"engine_id"`
 	Designation string `json:"designation"`
 }
 
 type DataResponse struct {
-	Data  []Response `json:"data"`
-	Error string     `json:"error"`
+	Data  []Response      `json:"data"`
+	Error *fault.Response `json:"error"`
 }
 
 type EnigneResponse struct {
-	Data  *Response `json:"data"`
-	Error string    `json:"error"`
+	Data  *Response       `json:"data"`
+	Error *fault.Response `json:"error"`
 }
 
 type ForCar struct {
@@ -21,6 +23,6 @@ type ForCar struct {
 }
 
 type ForCarResponse struct {
-	Data  *ForCar `json:"data"`
-	Error string  `json:"error"`
+	Data  *ForCar         `json:"data"`
+	Error *fault.Response `json:"error"`
 }

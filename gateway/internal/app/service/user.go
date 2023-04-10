@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"gateway/pkg/response/fault"
 	"gateway/pkg/response/user"
 	"net/http"
 
@@ -11,8 +12,7 @@ import (
 )
 
 func GetUser(userID string) (*user.DataResponse, error) {
-
-	httpResp, err := http.Get(fmt.Sprint(viper.GetString("userService"), "/user/", userID, "/cars"))
+	httpResp, err := http.Get(fmt.Sprint(viper.GetString("services.user"), "/user/", userID, "/cars"))
 	if err != nil {
 		log.Errorln("GetUserCars #1 ", err.Error())
 
@@ -28,6 +28,12 @@ func GetUser(userID string) (*user.DataResponse, error) {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
 		return nil, err
+	}
+
+	if resp.Error != nil {
+		log.Errorln("GetUserCars #3 ", resp.Error.Message)
+
+		return nil, &fault.Response{Message: resp.Error.Message}
 	}
 
 	return &resp, nil

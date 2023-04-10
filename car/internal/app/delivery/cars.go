@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"car/internal/app/domain"
 	"car/internal/app/infrastructure/repository"
 	"car/pkg/response/fault"
 	"car/pkg/util"
@@ -18,14 +17,14 @@ func PostCars(c echo.Context) error {
 	var req carReq.IDsRequest
 	err := c.Bind(&req)
 	if err != nil {
-		log.Errorln("PostCars #1", err.Error())
+		log.Errorln("PostCars #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	resp, err := repository.GetCarByUser(&req)
 	if err != nil {
-		log.Errorln("PostCars #2", err.Error())
+		log.Errorln("PostCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -37,14 +36,14 @@ func PostCarEngines(c echo.Context) error {
 	var req carReq.IDsRequest
 	err := c.Bind(&req)
 	if err != nil {
-		log.Errorln("PostCars #1", err.Error())
+		log.Errorln("PostCars #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	resp, err := repository.GetCarEngineByUser(&req)
 	if err != nil {
-		log.Errorln("PostCars #2", err.Error())
+		log.Errorln("PostCars #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -53,20 +52,20 @@ func PostCarEngines(c echo.Context) error {
 }
 
 func GetCarsByBrand(c echo.Context) error {
-	car := &domain.Car{
+	req := &carReq.Request{
 		Brand: c.Param("brand"),
 	}
 
-	err := car.ValidationBrand()
+	err := req.ValidationBrand()
 	if err != nil {
-		log.Errorln("GetCarsByBrand #1", err.Error())
+		log.Errorln("GetCarsByBrand #1 ", err.Error())
 
 		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	resp, err := repository.GetCarEngineByBrand(car)
+	resp, err := repository.GetCarEngineByBrand(req)
 	if err != nil {
-		log.Errorln("GetCarsByBrand #2", err.Error())
+		log.Errorln("GetCarsByBrand #2 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
@@ -77,23 +76,23 @@ func GetCarsByBrand(c echo.Context) error {
 func GetCarEngine(c echo.Context) error {
 	carID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		log.Errorln("GetCarEngine ", err.Error())
+		log.Errorln("GetCarEngine #1 ", err.Error())
 
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	car := &domain.Car{
+	req := &carReq.Request{
 		ID: carID,
 	}
 
-	err = car.ValidationID()
+	err = req.ValidationID()
 	if err != nil {
-		log.Infoln("GetCarEngine ", err.Error())
+		log.Infoln("GetCarEngine #2 ", err.Error())
 
 		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	resp, err := repository.GetCarEngine(car)
+	resp, err := repository.GetCarEngine(req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}

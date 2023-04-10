@@ -1,56 +1,56 @@
 package repository
 
 import (
-	"engine/internal/app/domain"
 	"engine/pkg/postgres"
 	"engine/pkg/request/engine"
+	resp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
 
 	"github.com/lib/pq"
 )
 
-func GetEngines(er *engine.IDsRequest) ([]domain.Engine, error) {
+func GetEngines(req *engine.IDsRequest) ([]resp.Engine, error) {
 	query := `
 		SELECT id as engine_id, engines.designation as designation
 			FROM engines
 		WHERE id = any($1)`
 
-	rows, err := postgres.DB.Query(query, pq.Array(er.EngineID))
+	rows, err := postgres.DB.Query(query, pq.Array(req.EngineID))
 
 	if err != nil {
 		return nil, err
 	}
 
-	var engineLinks []domain.Engine
+	var respLinks []resp.Engine
 
 	for rows.Next() {
-		var en domain.Engine
-		err = rows.Scan(&en.ID, &en.Designation)
+		var resp resp.Engine
+		err = rows.Scan(&resp.ID, &resp.Designation)
 		if err != nil {
 			return nil, err
 		}
 
-		engineLinks = append(engineLinks, en)
+		respLinks = append(respLinks, resp)
 	}
 
-	if len(engineLinks) == 0 {
+	if len(respLinks) == 0 {
 		return nil, fault.NewResponse("no rows in result set")
 	}
 
-	return engineLinks, nil
+	return respLinks, nil
 }
 
-func GetEngine(er *domain.Engine) (*domain.Engine, error) {
+func GetEngine(req *engine.Request) (*resp.Engine, error) {
 	query := `
 		SELECT id as engine_id, engines.designation as designation
 			FROM engines
 		WHERE id = $1`
 
-	var engine domain.Engine
+	var resp resp.Engine
 
-	if err := postgres.DB.QueryRow(query, er.ID).Scan(&engine.ID, &engine.Designation); err != nil {
+	if err := postgres.DB.QueryRow(query, req.ID).Scan(&resp.ID, &resp.Designation); err != nil {
 		return nil, err
 	}
 
-	return &engine, nil
+	return &resp, nil
 }

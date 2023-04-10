@@ -1,6 +1,10 @@
 {
-    "appPort": ":8080",
-    "carService": "http://localhost:8081",
-    "engineService": "http://localhost:8082",
-    "userService": "http://localhost:8083"
+    "app" : {
+        "port": ":8080"
+    },
+    "services" : {
+        "car": "http://localhost:8081",
+        "engine": "http://localhost:8082",
+        "user": "http://localhost:8083"
+    }
 }

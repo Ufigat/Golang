@@ -29,7 +29,6 @@ func GetUserCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	userCarsResp := &user.UserCarsResponse{
@@ -66,7 +65,7 @@ func GetUserEngines(c echo.Context) error {
 		enginesIDs = append(enginesIDs, carEngineDataResp.Data[i].EngineID)
 	}
 
-	enginesResp, err := service.CarEngines(enginesIDs)
+	enginesResp, err := service.PostEngines(enginesIDs)
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
 

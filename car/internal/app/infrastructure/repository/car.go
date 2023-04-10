@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"car/internal/app/domain"
 	"car/pkg/postgres"
 	carReq "car/pkg/request/car"
 	"car/pkg/response/car"
@@ -66,14 +65,14 @@ func GetCarEngineByUser(req *carReq.IDsRequest) ([]car.Response, error) {
 	return carLinksResp, nil
 }
 
-func GetCarEngineByBrand(carModel *domain.Car) ([]car.Response, error) {
+func GetCarEngineByBrand(req *carReq.Request) ([]car.Response, error) {
 	query := `
 	SELECT distinct cars.engine_id
 		FROM cars
 		JOIN brands ON cars.brand_id = brands.id
 	WHERE brands.name = $1`
 
-	rows, err := postgres.DB.Query(query, carModel.Brand)
+	rows, err := postgres.DB.Query(query, req.Brand)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +93,7 @@ func GetCarEngineByBrand(carModel *domain.Car) ([]car.Response, error) {
 	return carLinksResp, nil
 }
 
-func GetCarEngine(carModel *domain.Car) (*car.EngineIDResponse, error) {
+func GetCarEngine(req *carReq.Request) (*car.EngineIDResponse, error) {
 	query := `
 		SELECT cars.id as car_id, cars.engine_id
 			FROM cars
@@ -102,7 +101,7 @@ func GetCarEngine(carModel *domain.Car) (*car.EngineIDResponse, error) {
 
 	var carEngineResp car.EngineIDResponse
 
-	err := postgres.DB.QueryRow(query, carModel.ID).Scan(&carEngineResp.ID, &carEngineResp.EngineID)
+	err := postgres.DB.QueryRow(query, req.ID).Scan(&carEngineResp.ID, &carEngineResp.EngineID)
 	if err != nil {
 
 		return nil, err

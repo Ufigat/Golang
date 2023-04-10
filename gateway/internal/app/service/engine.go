@@ -13,49 +13,48 @@ import (
 	"github.com/spf13/viper"
 )
 
-func CarEngines(engineIDs []int) (*engineRes.DataResponse, error) {
-
+func PostEngines(engineIDs []int) (*engineRes.DataResponse, error) {
 	engineIDsReq := &engineReq.EnginesRequest{EngineIDs: engineIDs}
 	value, err := json.Marshal(&engineIDsReq)
 	if err != nil {
-		log.Errorln("CarEngines ", err.Error())
+		log.Errorln("CarEngines #1 ", err.Error())
 
-		return nil, err
+		return nil, &fault.Response{Message: err.Error()}
 	}
 
-	resp, err := http.Post(fmt.Sprint(viper.GetString("engineService"), "/engines"), "application/json", bytes.NewBuffer(value))
+	resp, err := http.Post(fmt.Sprint(viper.GetString("services.engine"), "/engines"), "application/json", bytes.NewBuffer(value))
 	if err != nil {
-		log.Errorln("CarEngines ", err.Error())
+		log.Errorln("CarEngines #2 ", err.Error())
 
-		return nil, err
+		return nil, &fault.Response{Message: err.Error()}
 	}
 
 	defer resp.Body.Close()
 
-	var carEnigneRespLinks engineRes.DataResponse
+	var carEnigneResp engineRes.DataResponse
 
-	err = json.NewDecoder(resp.Body).Decode(&carEnigneRespLinks)
+	err = json.NewDecoder(resp.Body).Decode(&carEnigneResp)
 	if err != nil {
-		log.Errorln("CarEngines ", err.Error())
+		log.Errorln("CarEngines #3 ", err.Error())
 
-		return nil, err
+		return nil, &fault.Response{Message: err.Error()}
 	}
 
-	if carEnigneRespLinks.Error != "" {
-		log.Errorln("CarEngines ", err.Error())
+	if carEnigneResp.Error != nil {
+		log.Errorln("CarEngines #4 ", carEnigneResp.Error.Message)
 
-		return nil, &fault.Response{Message: carEnigneRespLinks.Error}
+		return nil, &fault.Response{Message: carEnigneResp.Error.Message}
 	}
 
-	return &carEnigneRespLinks, nil
+	return &carEnigneResp, nil
 }
 
-func CarEngine(engineId int) (*engineRes.EnigneResponse, error) {
-	resp, err := http.Get(fmt.Sprint(viper.GetString("engineService"), "/engine?id=", engineId))
+func GetEngine(engineId int) (*engineRes.EnigneResponse, error) {
+	resp, err := http.Get(fmt.Sprint(viper.GetString("services.engine"), "/engine?id=", engineId))
 	if err != nil {
-		log.Errorln("CarEngine ", err.Error())
+		log.Errorln("CarEngine #1 ", err.Error())
 
-		return nil, err
+		return nil, &fault.Response{Message: err.Error()}
 	}
 
 	defer resp.Body.Close()
@@ -64,15 +63,15 @@ func CarEngine(engineId int) (*engineRes.EnigneResponse, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&dataResp)
 	if err != nil {
-		log.Errorln("CarEngine ", err.Error())
+		log.Errorln("CarEngine #2 ", err.Error())
 
-		return nil, err
+		return nil, &fault.Response{Message: err.Error()}
 	}
 
-	if dataResp.Error != "" {
-		log.Errorln("CarEngine ", err.Error())
+	if dataResp.Error != nil {
+		log.Errorln("CarEngine #3 ", dataResp.Error.Message)
 
-		return nil, &fault.Response{Message: dataResp.Error}
+		return nil, &fault.Response{Message: dataResp.Error.Message}
 	}
 
 	return &dataResp, nil

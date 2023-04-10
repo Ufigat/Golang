@@ -3,8 +3,8 @@ package delivery
 import (
 	"net/http"
 	"strconv"
-	"user/internal/app/domain"
 	"user/internal/app/infrastructure/repository"
+	"user/pkg/request/user"
 	"user/pkg/response/fault"
 	"user/pkg/util"
 
@@ -18,10 +18,10 @@ func GetUserCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserCars #1", err.Error())
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	user := &domain.User{
+	user := &user.Request{
 		ID: userID,
 	}
 

@@ -1,9 +1,12 @@
 {
-    "host": "localhost",
-    "port": 5432,
-    "user": "postgres",
-    "password": "password",
-    "dbname": "user",
-    "appPort": ":8083",
-    "carService": "http://localhost:8081"
+    "app" : {
+        "port": ":8083"
+    },
+    "postgresql": {
+        "host": "localhost",
+        "port": 5431,
+        "user": "postgres",
+        "password": "password",
+        "dbname": "user"
+    }
 }

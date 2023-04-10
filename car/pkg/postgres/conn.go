@@ -13,8 +13,8 @@ var DB *sql.DB
 
 func ConnectDB() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		viper.GetString("host"), viper.GetInt("port"), viper.GetString("user"),
-		viper.GetString("password"), viper.GetString("dbname"))
+		viper.GetString("postgresql.host"), viper.GetInt("postgresql.port"), viper.GetString("postgresql.user"),
+		viper.GetString("postgresql.password"), viper.GetString("postgresql.dbname"))
 
 	var err error
 	DB, err = sql.Open("postgres", psqlInfo)

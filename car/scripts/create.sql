@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS public.brands (
 
 CREATE TABLE IF NOT EXISTS public.cars (
     id  SERIAL PRIMARY KEY,
-    color_id int,
-    brand_id int,
-    engine_id int,
+    color_id int NOT NULL,
+    brand_id int NOT NULL,
+    engine_id int NOT NULL,
     UNIQUE (color_id, brand_id, engine_id),
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (brand_id) REFERENCES brands(id)

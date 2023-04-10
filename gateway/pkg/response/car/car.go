@@ -1,6 +1,9 @@
 package car
 
-import "gateway/pkg/response/engine"
+import (
+	"gateway/pkg/response/engine"
+	"gateway/pkg/response/fault"
+)
 
 type Response struct {
 	ID       int    `json:"id,omitempty"`
@@ -10,8 +13,8 @@ type Response struct {
 }
 
 type DataResponse struct {
-	Data  []Response `json:"data"`
-	Error string     `json:"error"`
+	Data  []Response      `json:"data"`
+	Error *fault.Response `json:"error"`
 }
 
 type EngineByBrandResponse struct {
@@ -20,6 +23,6 @@ type EngineByBrandResponse struct {
 }
 
 type CarEngineResponse struct {
-	Data  *Response `json:"data"`
-	Error string    `json:"error"`
+	Data  *Response       `json:"data"`
+	Error *fault.Response `json:"error"`
 }

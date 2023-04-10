@@ -3,6 +3,7 @@ package user
 import (
 	"gateway/pkg/response/car"
 	"gateway/pkg/response/engine"
+	"gateway/pkg/response/fault"
 )
 
 type UserCarsResponse struct {
@@ -24,6 +25,6 @@ type Response struct {
 }
 
 type DataResponse struct {
-	Data  []Response `json:"data"`
-	Error string     `json:"error"`
+	Data  []Response      `json:"data"`
+	Error *fault.Response `json:"error"`
 }

@@ -1,8 +1,12 @@
 {
-    "host": "localhost",
-    "port": 5432,
-    "user": "postgres",
-    "password": "password",
-    "dbname": "engine",
-    "appPort": ":8082"
+    "app" : {
+        "port": ":8082"
+    },
+    "postgresql": {
+        "host": "localhost",
+        "port": 5431,
+        "user": "postgres",
+        "password": "password",
+        "dbname": "engine"
+    }
 }

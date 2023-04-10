@@ -13,12 +13,12 @@ func InitRoutes(e *echo.Echo) {
 	ca.POST("/", delivery.PostCars)
 	ca.POST("/engines", delivery.PostCarEngines)
 	ca.GET("/:brand/engines-brand", delivery.GetCarsByBrand)
-	ca.GET("/engine/:id", delivery.GetCarEngine)
+	ca.GET("/:id/engine", delivery.GetCarEngine)
 
-	showRotes(e)
+	showRoutes(e)
 }
 
-func showRotes(e *echo.Echo) {
+func showRoutes(e *echo.Echo) {
 	data, err := json.MarshalIndent(e.Routes(), "", "  ")
 	if err != nil {
 		log.Fatal("fatal error parsing routes")

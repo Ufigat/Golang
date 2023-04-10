@@ -26,7 +26,7 @@ func GetCarEnginesByBrand(c echo.Context) error {
 		engineIDs = append(engineIDs, carResp.Data[i].EngineID)
 	}
 
-	engineDataResp, err := service.CarEngines(engineIDs)
+	engineDataResp, err := service.PostEngines(engineIDs)
 	if err != nil {
 		log.Errorln("GetCarEnginesByBrand #2 ", err.Error())
 
@@ -46,14 +46,14 @@ func GetCarEngine(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetCarEngine #1 ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	engineResp, err := service.CarEngine(carResp.Data.EngineID)
+	engineResp, err := service.GetEngine(carResp.Data.EngineID)
 	if err != nil {
-		log.Errorln("GetCarEngine #1 ", err.Error())
+		log.Errorln("GetCarEngine #2 ", err.Error())
 
-		return echo.ErrInternalServerError
+		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	resp := &engine.ForCar{
