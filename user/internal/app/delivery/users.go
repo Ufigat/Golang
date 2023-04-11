@@ -18,7 +18,7 @@ func GetUserCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetUserCars #1", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	err = user.ValidationID(userID)

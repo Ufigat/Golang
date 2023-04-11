@@ -9,7 +9,7 @@ import (
 
 func GetUser(userID int) (*res.Response, error) {
 	query := `
-		SELECT users.id, users.name, array_agg(user_cars.car_id) as car_ids
+		SELECT users.id, users.name, array_agg(user_cars.car_id)
 			FROM users
 		JOIN user_cars ON users.id = user_cars.user_id
 		WHERE id = $1

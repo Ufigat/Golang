@@ -19,7 +19,7 @@ func GetEngines(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetEngines #1 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	for i := range engineIDsReq {
@@ -43,7 +43,7 @@ func GetEngine(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetEngine #1 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &engineResp.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &engineResp.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	err = engine.ValidationID(engineID)

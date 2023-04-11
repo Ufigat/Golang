@@ -19,7 +19,7 @@ func GetCars(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetCars #1 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	resp, err := repository.GetCarByUser(carsIDs)
@@ -38,7 +38,7 @@ func GetCarEngines(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetCarEngines #1 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	resp, err := repository.GetCarEngineByUser(carsIDs)
@@ -78,7 +78,7 @@ func GetCarEngine(c echo.Context) error {
 	if err != nil {
 		log.Errorln("GetCarEngine #1 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
 	req := &carReq.Request{
