@@ -2,6 +2,8 @@ package delivery
 
 import (
 	"car/internal/app/infrastructure/repository"
+	"car/pkg/rabbitmq"
+	"car/pkg/response/car"
 	"car/pkg/response/fault"
 	"car/pkg/util"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	carReq "car/pkg/request/car"
 
 	"github.com/labstack/echo/v4"
+	amqp "github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -51,26 +54,40 @@ func GetCarEngines(c echo.Context) error {
 	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }
 
-func GetCarsByBrand(c echo.Context) error {
-	req := &carReq.Request{
-		Brand: c.Param("brand"),
-	}
+func GetCarsByBrand(delivery <-chan amqp.Delivery) {
+	for d := range delivery {
 
+		req := &carReq.Request{
+			Brand: string(d.Body),
+		}
+
+		resp, err := usecaseBrand(req)
+		if err != nil {
+			log.Errorln("GetCarsByBrand #1 ", err.Error())
+
+			rabbitmq.SendCarMessage(&util.Response{Error: fault.NewResponse(err.Error())})
+		} else {
+			rabbitmq.SendCarMessage(&util.Response{Data: resp})
+		}
+	}
+}
+
+func usecaseBrand(req *carReq.Request) ([]car.Response, error) {
 	err := req.ValidationBrand()
 	if err != nil {
 		log.Errorln("GetCarsByBrand #1 ", err.Error())
 
-		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
+		return nil, err
 	}
 
 	resp, err := repository.GetCarEngineByBrand(req)
 	if err != nil {
 		log.Errorln("GetCarsByBrand #2 ", err.Error())
 
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
+		return nil, err
 	}
 
-	return c.JSON(http.StatusOK, &util.Response{Data: resp})
+	return resp, nil
 }
 
 func GetCarEngine(c echo.Context) error {

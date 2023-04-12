@@ -2,7 +2,6 @@ package main
 
 import (
 	"car/internal/app/routing"
-	database "car/pkg/postgres"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -22,13 +21,10 @@ func init() {
 }
 
 func main() {
-	err := database.ConnectDB()
-	if err != nil {
-		log.Fatalf("fatal DB connect error: %s", err.Error())
-	}
 
 	e := echo.New()
-	routing.InitRoutes(e)
+	routing.Init()
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
+
 }

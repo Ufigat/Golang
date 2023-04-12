@@ -3,19 +3,24 @@ package routing
 import (
 	"encoding/json"
 	"gateway/internal/app/delivery"
+	"gateway/pkg/rabbitmq"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
 
-func InitRoutes(e *echo.Echo) {
-	us := e.Group("/user/:id")
-	us.GET("/cars", delivery.GetUserCars)
-	us.GET("/engines", delivery.GetUserEngines)
+func InitRoutes(e *echo.Echo, c *rabbitmq.Connect) {
+	d := &delivery.Delivery{Conn: c}
 
-	ca := e.Group("/cars")
-	ca.GET("/:id/engine", delivery.GetCarEngine)
-	ca.GET("/:brand/engines-brand", delivery.GetCarEnginesByBrand)
+	// us := e.Group("/user/:id")
+	// us.GET("/cars", delivery.GetUserCars)
+	// us.GET("/engines", delivery.GetUserEngines)
+
+	// ca := e.Group("/cars")
+	// ca.GET("/:id/engine", delivery.GetCarEngine)
+	// ca.GET("/:brand/engines-brand", delivery.GetCarEnginesByBrand)
+
+	e.GET("/ws/:brand", d.GetCarEnginesByBrand)
 
 	showRoutes(e)
 }

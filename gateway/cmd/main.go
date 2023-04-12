@@ -2,6 +2,7 @@ package main
 
 import (
 	"gateway/internal/app/routing"
+	"gateway/pkg/rabbitmq"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -21,8 +22,17 @@ func init() {
 }
 
 func main() {
+	// conn := &rabbitmq.Connect{Conn: nil, Queue: nil, Channel: nil}
+
+	conn := rabbitmq.NewConnect()
+
+	err := rabbitmq.ConnRabbit(conn)
+	if err != nil {
+		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
+	}
+
 	e := echo.New()
-	routing.InitRoutes(e)
+	routing.InitRoutes(e, conn)
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 }
