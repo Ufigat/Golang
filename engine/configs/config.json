@@ -8,5 +8,11 @@
         "user": "postgres",
         "password": "password",
         "dbname": "engine"
+    },
+    "rabbit" : {
+        "host": "localhost",
+        "port": ":5672/",
+        "user": "rmuser:",
+        "password": "rmpassword@"
     }
 }

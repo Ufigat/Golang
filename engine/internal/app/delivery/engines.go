@@ -1,64 +1,78 @@
 package delivery
 
 import (
+	"encoding/json"
 	"engine/internal/app/infrastructure/repository"
+	"engine/pkg/rabbitmq"
 	"engine/pkg/request/engine"
-	engineResp "engine/pkg/response/engine"
 	"engine/pkg/response/fault"
 	"engine/pkg/util"
-	"net/http"
+	"fmt"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	amqp "github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
 )
 
-func GetEngines(c echo.Context) error {
-	var engineIDsReq []int
-	err := c.Bind(&engineIDsReq)
-	if err != nil {
-		log.Errorln("GetEngines #1 ", err.Error())
+func GetEngines(c *rabbitmq.Connect, delivery <-chan amqp.Delivery) {
+	for d := range delivery {
+		var engineIDsReq []int
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
+		err := json.Unmarshal(d.Body, &engineIDsReq)
+		if err != nil {
+			log.Errorln("GetEngines #1 ", err.Error())
 
-	for i := range engineIDsReq {
-		if engineIDsReq[i] <= 0 {
-			return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse("ID is not valid")})
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
 		}
+
+		fmt.Println(engineIDsReq)
+		err = engine.ValidationIDs(engineIDsReq)
+		if err != nil {
+			log.Infoln("GetEngine #2 ", err.Error())
+
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
+		}
+
+		response, err := repository.GetEngines(engineIDsReq)
+		if err != nil {
+			log.Errorln("GetEngines #3 ", err.Error())
+
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
+		}
+
+		c.ProduceSendEngines(&util.Response{Data: response})
 	}
-
-	response, err := repository.GetEngines(engineIDsReq)
-	if err != nil {
-		log.Errorln("GetEngines #2 ", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: response})
 }
 
-func GetEngine(c echo.Context) error {
-	engineID, err := strconv.Atoi(c.QueryParam("id"))
-	if err != nil {
-		log.Errorln("GetEngine #1 ", err.Error())
+func GetEngine(c *rabbitmq.Connect, delivery <-chan amqp.Delivery) {
+	for d := range delivery {
+		engineID, err := strconv.Atoi(string(d.Body))
+		if err != nil {
+			log.Errorln("GetEngine #1 ", err.Error())
 
-		return c.JSON(http.StatusBadRequest, &engineResp.Response{Error: fault.NewResponse(err.Error())})
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
+		}
+
+		err = engine.ValidationID(engineID)
+		if err != nil {
+			log.Infoln("GetEngine #2 ", err.Error())
+
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
+		}
+
+		response, err := repository.GetEngine(engineID)
+		if err != nil {
+			log.Errorln("GetEngine #3 ", err.Error())
+
+			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			continue
+		}
+
+		c.ProduceSendEngines(&util.Response{Data: response})
 	}
-
-	err = engine.ValidationID(engineID)
-	if err != nil {
-		log.Infoln("GetEngine #2 ", err.Error())
-
-		return c.JSON(http.StatusUnprocessableEntity, &engineResp.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	response, err := repository.GetEngine(engineID)
-	if err != nil {
-		log.Errorln("GetEngine #3 ", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, &engineResp.Response{Engine: response, Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: response})
 }

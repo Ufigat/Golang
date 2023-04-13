@@ -10,7 +10,6 @@ import (
 )
 
 func InitRoutes(e *echo.Echo, c *rabbitmq.Connect) {
-	d := &delivery.Delivery{Conn: c}
 
 	// us := e.Group("/user/:id")
 	// us.GET("/cars", delivery.GetUserCars)
@@ -20,7 +19,16 @@ func InitRoutes(e *echo.Echo, c *rabbitmq.Connect) {
 	// ca.GET("/:id/engine", delivery.GetCarEngine)
 	// ca.GET("/:brand/engines-brand", delivery.GetCarEnginesByBrand)
 
-	e.GET("/ws/:brand", d.GetCarEnginesByBrand)
+	// sendCar := c.ConsumeSendCar()
+	// sendEngines := c.ConsumeSendEngines()
+	//d := &delivery.Delivery{Conn: c, SendCar: sendCar, SendEngines: sendEngines}
+
+	// ca := e.Group("/cars")
+	// ca.GET("/:id/engine", d.GetCarEngine)
+	// ca.GET("/:brand", d.GetCarEnginesByBrand)
+
+	ws := e.Group("/ws")
+	ws.GET("/connect/:id", delivery.WsConnect)
 
 	showRoutes(e)
 }

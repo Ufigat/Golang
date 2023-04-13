@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"gateway/pkg/response/car"
-	"log"
+	"fmt"
+	"gateway/pkg/util"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,33 +15,24 @@ var Upgrader = websocket.Upgrader{
 type Client struct {
 	Conn *websocket.Conn
 
-	Send chan car.DataResponse
+	Send chan *util.Response
 
 	WritePumpClose chan bool
-}
 
-func (c *Client) ReadPump() {
-	defer func() {
-		c.Conn.Close()
-		c.WritePumpClose <- true
-		close(c.WritePumpClose)
-		close(c.Send)
-	}()
-	for {
-		_, _, err := c.Conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("readPump close: %v", err)
-			}
-			break
-		}
-	}
+	ID int
 }
 
 func (c *Client) WritePump() {
+	defer func() {
+		c.Conn.Close()
+		close(c.WritePumpClose)
+		close(c.Send)
+		fmt.Println("connection close")
+	}()
 	for {
 		select {
 		case message, ok := <-c.Send:
+			fmt.Println("message", message)
 			if !ok {
 				break
 			}
@@ -51,6 +42,7 @@ func (c *Client) WritePump() {
 			}
 
 		case <-c.WritePumpClose:
+			fmt.Println("defer after ReadPump")
 			return
 		}
 	}

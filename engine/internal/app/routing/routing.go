@@ -1,25 +1,27 @@
 package routing
 
 import (
-	"encoding/json"
 	"engine/internal/app/delivery"
-
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+	database "engine/pkg/postgres"
+	"engine/pkg/rabbitmq"
+	"log"
 )
 
-func InitRoutes(e *echo.Echo) {
-	e.POST("/engines", delivery.GetEngines)
-	e.GET("/engine", delivery.GetEngine)
-
-	showRoutes(e)
-}
-
-func showRoutes(e *echo.Echo) {
-	data, err := json.MarshalIndent(e.Routes(), "", "  ")
+func Init() {
+	err := database.ConnectDB()
 	if err != nil {
-		logrus.Fatal("fatal error parsing routes")
+		log.Fatalf("fatal DB connect error: %s", err.Error())
 	}
 
-	logrus.Infoln(string(data))
+	conn := rabbitmq.NewConnect()
+
+	err = rabbitmq.ConnRabbit(conn)
+	if err != nil {
+		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
+	}
+
+	mes := conn.ConsumeEnginesChan()
+
+	go delivery.GetEngines(conn, mes)
+	//go delivery.GetEngine(conn, mes)
 }

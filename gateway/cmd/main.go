@@ -22,8 +22,6 @@ func init() {
 }
 
 func main() {
-	// conn := &rabbitmq.Connect{Conn: nil, Queue: nil, Channel: nil}
-
 	conn := rabbitmq.NewConnect()
 
 	err := rabbitmq.ConnRabbit(conn)
