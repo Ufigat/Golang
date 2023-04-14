@@ -11,9 +11,12 @@ import (
 	carReq "car/pkg/request/car"
 
 	"github.com/labstack/echo/v4"
-	amqp "github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
 )
+
+type Delivery struct {
+	Conn *rabbitmq.Connect
+}
 
 func GetCars(c echo.Context) error {
 	var carsIDs []int
@@ -53,18 +56,18 @@ func GetCarEngines(c echo.Context) error {
 	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }
 
-func GetCarsByBrand(delivery <-chan amqp.Delivery) {
-	for d := range delivery {
+func (d *Delivery) GetCarsByBrand() {
+	for dc := range d.Conn.QueueChannel["GetCar"].DeliveryChan {
 
 		req := &carReq.Request{
-			Brand: string(d.Body),
+			Brand: string(dc.Body),
 		}
 
 		err := req.ValidationBrand()
 		if err != nil {
 			log.Errorln("GetCarsByBrand #1 ", err.Error())
 
-			rabbitmq.SendCarMessage(&util.Response{Error: fault.NewResponse(err.Error())})
+			d.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())})
 			continue
 		}
 
@@ -72,11 +75,11 @@ func GetCarsByBrand(delivery <-chan amqp.Delivery) {
 		if err != nil {
 			log.Errorln("GetCarsByBrand #2 ", err.Error())
 
-			rabbitmq.SendCarMessage(&util.Response{Error: fault.NewResponse(err.Error())})
+			d.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())})
 			continue
 		}
 
-		rabbitmq.SendCarMessage(&util.Response{Data: resp})
+		d.ProduceMessage(&util.Response{Data: resp})
 	}
 }
 

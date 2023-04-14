@@ -93,12 +93,12 @@ func (c *Connect) Create() error {
 	}
 
 	c.Queue.EnginesQueue, err = c.Channel.EnginesChan.QueueDeclare(
-		"GetEnginesChan", // name
-		false,            // durable
-		false,            // delete when unused
-		false,            // exclusive
-		false,            // no-wait
-		nil,              // arguments
+		"GetEngines", // name
+		false,        // durable
+		false,        // delete when unused
+		false,        // exclusive
+		false,        // no-wait
+		nil,          // arguments
 	)
 	if err != nil {
 		log.Errorln("Create #2 ", err.Error())

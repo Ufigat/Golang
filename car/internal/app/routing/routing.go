@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func Init() {
+func Init(c *rabbitmq.Connect) {
 	// ca := e.Group("/cars")
 	// ca.POST("", delivery.GetCars)
 	// ca.POST("/engines", delivery.GetCarEngines)
@@ -24,8 +24,8 @@ func Init() {
 		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
 	}
 
-	mes := rabbitmq.ConsumeGetCarMessage()
-	go delivery.GetCarsByBrand(mes)
+	c.ConsumeMessage("SendCar", "SendCar")
+	go delivery.GetCarsByBrand()
 
 	// showRoutes(e)
 }

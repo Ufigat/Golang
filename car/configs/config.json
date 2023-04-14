@@ -14,5 +14,13 @@
         "port": ":5672/",
         "user": "rmuser:",
         "password": "rmpassword@"
-    }
+    },
+    "channels" : [
+        "GetCar",
+        "SendCar"
+    ],
+    "queue" : [
+        "GetCar",
+        "SendCar"
+    ]
 }

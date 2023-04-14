@@ -11,7 +11,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func WsConnect(c echo.Context) error {
+type Ws struct {
+	Room *websocket.Room
+}
+
+func (w *Ws) WsConnect(c echo.Context) error {
 	clientID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Errorln("WsConnect #1 ", err.Error())
@@ -27,6 +31,9 @@ func WsConnect(c echo.Context) error {
 
 	client := &websocket.Client{Conn: conn, Send: make(chan *util.Response), WritePumpClose: make(chan bool), ID: clientID}
 
+	w.Room.Clients[clientID] = client
+
+	go client.ReadPump()
 	go client.WritePump()
 
 	client.Send <- &util.Response{Data: &util.Client{ID: clientID}}

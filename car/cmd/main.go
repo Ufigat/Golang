@@ -2,6 +2,7 @@ package main
 
 import (
 	"car/internal/app/routing"
+	"car/pkg/rabbitmq"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +22,13 @@ func init() {
 }
 
 func main() {
+
+	conn := rabbitmq.NewConnect()
+
+	err := rabbitmq.ConnRabbit(conn)
+	if err != nil {
+		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
+	}
 
 	e := echo.New()
 	routing.Init()

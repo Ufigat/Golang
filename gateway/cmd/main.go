@@ -3,6 +3,7 @@ package main
 import (
 	"gateway/internal/app/routing"
 	"gateway/pkg/rabbitmq"
+	"gateway/pkg/websocket"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	e := echo.New()
-	routing.InitRoutes(e, conn)
+	routing.InitRoutes(e, conn, &websocket.Room{Clients: make(map[int]*websocket.Client)})
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 }

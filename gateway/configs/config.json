@@ -14,7 +14,17 @@
         "password": "rmpassword@"
     },
     "channels" : [
-        "a",
-        "b"
+        "GetCar",
+        "SendCar",
+        "GetEngines",
+        "SendEngines",
+        "SendEngine"
+    ],
+    "queue" : [
+        "GetCar",
+        "SendCar",
+        "GetEngines",
+        "SendEngines",
+        "SendEngine"
     ]
 }

@@ -3,6 +3,7 @@ package websocket
 import (
 	"fmt"
 	"gateway/pkg/util"
+	"log"
 
 	"github.com/gorilla/websocket"
 )
@@ -20,6 +21,25 @@ type Client struct {
 	WritePumpClose chan bool
 
 	ID int
+}
+
+type Room struct {
+	Clients map[int]*Client
+}
+
+func (c *Client) ReadPump() {
+	defer func() {
+		c.WritePumpClose <- true
+	}()
+	for {
+		_, _, err := c.Conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("readPump close: %v", err)
+			}
+			break
+		}
+	}
 }
 
 func (c *Client) WritePump() {
