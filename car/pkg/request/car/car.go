@@ -26,3 +26,13 @@ func (c *Request) ValidationBrand() error {
 
 	return nil
 }
+
+func (c *IDsRequest) ValidationIDs() error {
+	for i := range c.CarsIDs {
+		if c.CarsIDs[i] <= 0 {
+			return errors.New("field id is not valid")
+		}
+	}
+
+	return nil
+}

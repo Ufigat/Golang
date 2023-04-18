@@ -2,26 +2,18 @@ package routing
 
 import (
 	"engine/internal/app/delivery"
-	database "engine/pkg/postgres"
 	"engine/pkg/rabbitmq"
-	"log"
 )
 
-func Init() {
-	err := database.ConnectDB()
-	if err != nil {
-		log.Fatalf("fatal DB connect error: %s", err.Error())
-	}
+func Init(c *rabbitmq.Connect) {
+	createConsumers(c)
 
-	conn := rabbitmq.NewConnect()
+	e := &delivery.Engine{Conn: c}
+	go e.GetEngines()
+	go e.GetEngine()
+}
 
-	err = rabbitmq.ConnRabbit(conn)
-	if err != nil {
-		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
-	}
-
-	mes := conn.ConsumeEnginesChan()
-
-	go delivery.GetEngines(conn, mes)
-	//go delivery.GetEngine(conn, mes)
+func createConsumers(c *rabbitmq.Connect) {
+	c.ConsumeMessage("GetEngines", "GetEngines")
+	c.ConsumeMessage("GetEngine", "GetEngine")
 }

@@ -18,7 +18,7 @@ type EnigneResponse struct {
 }
 
 type ForCar struct {
-	ID     int       `json:"car_id"`
+	ID     string    `json:"car_id"`
 	Engine *Response `json:"engine"`
 }
 

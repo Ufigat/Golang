@@ -3,22 +3,15 @@ package usecase
 import (
 	"encoding/json"
 
-	"gateway/pkg/rabbitmq"
 	"gateway/pkg/response/car"
 	"gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
 	"gateway/pkg/util"
-	"gateway/pkg/websocket"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type Usacase struct {
-	Room *websocket.Room
-	Conn *rabbitmq.Connect
-}
-
-func (u *Usacase) GetCarEnginesByBrand(clientID int, brand string) {
+func (u *Usacase) GetUserCars(clientID int, brand string) {
 	client := u.Room.Clients[clientID]
 
 	err := u.Conn.ProduceMessage([]byte(brand), "GetCar", "GetCar")
@@ -97,12 +90,12 @@ func (u *Usacase) GetCarEnginesByBrand(clientID int, brand string) {
 	client.Send <- &util.Response{Data: carEngineByBrandResp}
 }
 
-func (u *Usacase) GetCarEngine(clientID int, carID string) {
+func (u *Usacase) GetUserEngines(clientID int, carID string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(carID), "GetCarEngine", "GetCarEngine")
+	err := u.Conn.ProduceMessage([]byte(carID), "GetUserEngines", "GetUserEngines")
 	if err != nil {
-		log.Errorln("GetCarEngine #1 ", err.Error())
+		log.Errorln("GetUserEngines #1 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
@@ -114,14 +107,14 @@ func (u *Usacase) GetCarEngine(clientID int, carID string) {
 
 	err = json.Unmarshal(msgSendCar.Body, &carResp)
 	if err != nil {
-		log.Errorln("GetCarEngine #2 ", err.Error())
+		log.Errorln("GetUserEngines #2 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
 	if carResp.Error != nil {
-		log.Errorln("GetCarEngine #3 ", carResp.Error.Message)
+		log.Errorln("GetUserEngines #3 ", carResp.Error.Message)
 
 		client.Send <- &util.Response{Error: carResp.Error}
 		return
@@ -129,7 +122,7 @@ func (u *Usacase) GetCarEngine(clientID int, carID string) {
 
 	value, err := json.Marshal(carResp.Data.EngineID)
 	if err != nil {
-		log.Errorln("GetCarEngine #4 ", err.Error())
+		log.Errorln("GetUserEngines #4 ", err.Error())
 
 		client.Send <- &util.Response{Error: carResp.Error}
 		return
@@ -137,7 +130,7 @@ func (u *Usacase) GetCarEngine(clientID int, carID string) {
 
 	err = u.Conn.ProduceMessage(value, "GetEngine", "GetEngine")
 	if err != nil {
-		log.Errorln("GetCarEngine #5 ", err.Error())
+		log.Errorln("GetUserEngines #5 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
@@ -149,14 +142,14 @@ func (u *Usacase) GetCarEngine(clientID int, carID string) {
 
 	err = json.Unmarshal(msgSendEngines.Body, &engineResp)
 	if err != nil {
-		log.Errorln("GetCarEngine #6 ", err.Error())
+		log.Errorln("GetUserEngines #6 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
 	if engineResp.Error != nil {
-		log.Errorln("GetCarEngine #7 ", engineResp.Error.Error())
+		log.Errorln("GetUserEngines #7 ", engineResp.Error.Error())
 
 		client.Send <- &util.Response{Error: engineResp.Error}
 		return

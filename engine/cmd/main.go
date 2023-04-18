@@ -36,7 +36,7 @@ func main() {
 	}
 
 	e := echo.New()
-	routing.Init()
+	routing.Init(conn)
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 }

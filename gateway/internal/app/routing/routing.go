@@ -10,30 +10,38 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func InitRoutes(e *echo.Echo, c *rabbitmq.Connect, r *websocket.Room) {
+func InitRoutes(e *echo.Echo, r *rabbitmq.Connect, wr *websocket.Room) {
+	createConsumers(r)
+	initWs(e, wr)
+	initHttp(e, r, wr)
 
-	// us := e.Group("/user/:id")
-	// us.GET("/cars", delivery.GetUserCars)
-	// us.GET("/engines", delivery.GetUserEngines)
+	showRoutes(e)
+}
 
-	// ca := e.Group("/cars")
-	// ca.GET("/:id/engine", delivery.GetCarEngine)
-	// ca.GET("/:brand/engines-brand", delivery.GetCarEnginesByBrand)
-
+func createConsumers(c *rabbitmq.Connect) {
 	c.ConsumeMessage("SendCar", "SendCar")
 	c.ConsumeMessage("SendEngines", "SendEngines")
-	d := &delivery.Delivery{Conn: c, Room: r}
+	c.ConsumeMessage("SendCarEngine", "SendCarEngine")
+	c.ConsumeMessage("SendEngine", "SendEngine")
+}
 
-	ca := e.Group("/cars/:id")
-	ca.GET("/:brand/engines-brand", d.GetCarEnginesByBrand)
-	// ca.GET("/:id/engine", d.GetCarEngine)
-
-	w := &delivery.Ws{Room: r}
+func initWs(e *echo.Echo, wr *websocket.Room) {
+	w := &delivery.Ws{Room: wr}
 
 	ws := e.Group("/ws")
 	ws.GET("/connect/:id", w.WsConnect)
+}
 
-	showRoutes(e)
+func initHttp(e *echo.Echo, r *rabbitmq.Connect, wr *websocket.Room) {
+	d := &delivery.Delivery{Conn: r, Room: wr}
+
+	us := e.Group("/user/:client/:id")
+	us.GET("/cars", delivery.GetUserCars)
+	us.GET("/engines", delivery.GetUserEngines)
+
+	ca := e.Group("/cars/:client")
+	ca.GET("/:brand/engines-brand", d.GetCarEnginesByBrand)
+	ca.GET("/:car/engine", d.GetCarEngine)
 }
 
 func showRoutes(e *echo.Echo) {

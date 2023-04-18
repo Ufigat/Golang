@@ -2,6 +2,7 @@ package main
 
 import (
 	"car/internal/app/routing"
+	"car/pkg/postgres"
 	"car/pkg/rabbitmq"
 
 	"github.com/labstack/echo/v4"
@@ -23,15 +24,20 @@ func init() {
 
 func main() {
 
+	err := postgres.ConnectDB()
+	if err != nil {
+		log.Fatalf("fatal DB connect error: %s", err.Error())
+	}
+
 	conn := rabbitmq.NewConnect()
 
-	err := rabbitmq.ConnRabbit(conn)
+	err = rabbitmq.ConnRabbit(conn)
 	if err != nil {
 		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
 	}
 
 	e := echo.New()
-	routing.Init()
+	routing.Init(conn)
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 

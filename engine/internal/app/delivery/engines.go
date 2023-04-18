@@ -7,72 +7,113 @@ import (
 	"engine/pkg/request/engine"
 	"engine/pkg/response/fault"
 	"engine/pkg/util"
-	"fmt"
 	"strconv"
 
-	amqp "github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
 )
 
-func GetEngines(c *rabbitmq.Connect, delivery <-chan amqp.Delivery) {
-	for d := range delivery {
+type Engine struct {
+	Conn *rabbitmq.Connect
+}
+
+func (e *Engine) GetEngines() {
+	for d := range e.Conn.QueueChannel["GetEngines"].DeliveryChan {
 		var engineIDsReq []int
 
 		err := json.Unmarshal(d.Body, &engineIDsReq)
 		if err != nil {
 			log.Errorln("GetEngines #1 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			if err != nil {
+				log.Fatalf("GetEngines #2 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
-		fmt.Println(engineIDsReq)
 		err = engine.ValidationIDs(engineIDsReq)
 		if err != nil {
-			log.Infoln("GetEngine #2 ", err.Error())
+			log.Infoln("GetEngines #3 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			if err != nil {
+				log.Fatalf("GetEngines #4 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
-		response, err := repository.GetEngines(engineIDsReq)
+		resp, err := repository.GetEngines(engineIDsReq)
 		if err != nil {
-			log.Errorln("GetEngines #3 ", err.Error())
+			log.Errorln("GetEngines #5 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			if err != nil {
+				log.Fatalf("GetEngines #6 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
-		c.ProduceSendEngines(&util.Response{Data: response})
+		err = e.Conn.ProduceMessage(&util.Response{Data: resp}, "SendEngines", "SendEngines")
+		if err != nil {
+			log.Fatalf("GetEngines #7 ", err.Error())
+
+			break
+		}
 	}
 }
 
-func GetEngine(c *rabbitmq.Connect, delivery <-chan amqp.Delivery) {
-	for d := range delivery {
+func (e *Engine) GetEngine() {
+	for d := range e.Conn.QueueChannel["GetEngine"].DeliveryChan {
 		engineID, err := strconv.Atoi(string(d.Body))
 		if err != nil {
 			log.Errorln("GetEngine #1 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			if err != nil {
+				log.Fatalf("GetEngine #2 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
 		err = engine.ValidationID(engineID)
 		if err != nil {
-			log.Infoln("GetEngine #2 ", err.Error())
+			log.Infoln("GetEngine #3 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			if err != nil {
+				log.Fatalf("GetEngine #4 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
 		response, err := repository.GetEngine(engineID)
 		if err != nil {
-			log.Errorln("GetEngine #3 ", err.Error())
+			log.Errorln("GetEngine #5 ", err.Error())
 
-			c.ProduceSendEngines(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			if err != nil {
+				log.Fatalf("GetEngine #6 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
-		c.ProduceSendEngines(&util.Response{Data: response})
+		err = e.Conn.ProduceMessage(&util.Response{Data: response}, "SendEngine", "SendEngine")
+		if err != nil {
+			log.Fatalf("GetEngine #7 ", err.Error())
+
+			break
+		}
 	}
 }

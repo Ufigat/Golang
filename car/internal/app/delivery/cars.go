@@ -5,59 +5,122 @@ import (
 	"car/pkg/rabbitmq"
 	"car/pkg/response/fault"
 	"car/pkg/util"
-	"net/http"
+	"encoding/json"
 	"strconv"
 
 	carReq "car/pkg/request/car"
 
-	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
 
-type Delivery struct {
+type Car struct {
 	Conn *rabbitmq.Connect
 }
 
-func GetCars(c echo.Context) error {
-	var carsIDs []int
-	err := c.Bind(&carsIDs)
-	if err != nil {
-		log.Errorln("GetCars #1 ", err.Error())
+func (c *Car) GetCars() {
+	for dc := range c.Conn.QueueChannel["GetCars"].DeliveryChan {
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
+		var carsIDs carReq.IDsRequest
+
+		err := json.Unmarshal(dc.Body, &carsIDs)
+		if err != nil {
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			if err != nil {
+				log.Fatalf("GetCars #1 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = carsIDs.ValidationIDs()
+		if err != nil {
+			log.Errorln("GetCars #2 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			if err != nil {
+				log.Fatalf("GetCars #3 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		resp, err := repository.GetCarForUser(carsIDs.CarsIDs)
+		if err != nil {
+			log.Errorln("GetCars #4 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			if err != nil {
+				log.Fatalf("GetCars #5 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCars", "SendCars")
+		if err != nil {
+			log.Fatalf("GetCars #6 ", err.Error())
+
+			break
+		}
 	}
-
-	resp, err := repository.GetCarByUser(carsIDs)
-	if err != nil {
-		log.Errorln("GetCars #2 ", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }
 
-func GetCarEngines(c echo.Context) error {
-	var carsIDs []int
-	err := c.Bind(&carsIDs)
-	if err != nil {
-		log.Errorln("GetCarEngines #1 ", err.Error())
+func (c *Car) GetCarEngines() {
+	for dc := range c.Conn.QueueChannel["GetCarEngines"].DeliveryChan {
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
+		var carsIDs carReq.IDsRequest
+
+		err := json.Unmarshal(dc.Body, &carsIDs)
+		if err != nil {
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			if err != nil {
+				log.Fatalf("GetCarEngines #1 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = carsIDs.ValidationIDs()
+		if err != nil {
+			log.Errorln("GetCarEngines #2 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			if err != nil {
+				log.Fatalf("GetCarEngines #3 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		resp, err := repository.GetCarEngineForUser(carsIDs.CarsIDs)
+		if err != nil {
+			log.Errorln("GetCarEngines #4 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			if err != nil {
+				log.Fatalf("GetCarEngines #5 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCarEngines", "SendCarEngines")
+		if err != nil {
+			log.Fatalf("GetCarEngines #6 ", err.Error())
+
+			break
+		}
 	}
-
-	resp, err := repository.GetCarEngineByUser(carsIDs)
-	if err != nil {
-		log.Errorln("GetCarEngines #2 ", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }
 
-func (d *Delivery) GetCarsByBrand() {
-	for dc := range d.Conn.QueueChannel["GetCar"].DeliveryChan {
+func (c *Car) GetCarsByBrand() {
+	for dc := range c.Conn.QueueChannel["GetCar"].DeliveryChan {
 
 		req := &carReq.Request{
 			Brand: string(dc.Body),
@@ -67,45 +130,88 @@ func (d *Delivery) GetCarsByBrand() {
 		if err != nil {
 			log.Errorln("GetCarsByBrand #1 ", err.Error())
 
-			d.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCar", "SendCar")
+			if err != nil {
+				log.Fatalf("GetCarsByBrand #2 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
 		resp, err := repository.GetCarEngineByBrand(req)
 		if err != nil {
-			log.Errorln("GetCarsByBrand #2 ", err.Error())
+			log.Errorln("GetCarsByBrand #3 ", err.Error())
 
-			d.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())})
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCar", "SendCar")
+			if err != nil {
+				log.Fatalf("GetCarsByBrand #4 ", err.Error())
+
+				break
+			}
 			continue
 		}
 
-		d.ProduceMessage(&util.Response{Data: resp})
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCar", "SendCar")
+		if err != nil {
+			log.Fatalf("GetCarsByBrand #5 ", err.Error())
+
+			break
+		}
 	}
 }
 
-func GetCarEngine(c echo.Context) error {
-	carID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		log.Errorln("GetCarEngine #1 ", err.Error())
+func (c *Car) GetCarEngine() {
+	for dc := range c.Conn.QueueChannel["GetCarEngine"].DeliveryChan {
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
+		carID, err := strconv.Atoi(string(dc.Body))
+		if err != nil {
+			log.Errorln("GetCarEngine #1 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			if err != nil {
+				log.Fatalf("GetCarEngine #2 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		req := &carReq.Request{
+			ID: carID,
+		}
+
+		err = req.ValidationID()
+		if err != nil {
+			log.Errorln("GetCarEngine #3 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			if err != nil {
+				log.Fatalf("GetCarEngine #4 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		resp, err := repository.GetCarEngine(req)
+		if err != nil {
+			log.Errorln("GetCarEngine #5 ", err.Error())
+
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			if err != nil {
+				log.Fatalf("GetCarEngine #6 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCarEngine", "SendCarEngine")
+		if err != nil {
+			log.Fatalf("GetCarEngine #7 ", err.Error())
+
+			break
+		}
 	}
-
-	req := &carReq.Request{
-		ID: carID,
-	}
-
-	err = req.ValidationID()
-	if err != nil {
-		log.Infoln("GetCarEngine #2 ", err.Error())
-
-		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	resp, err := repository.GetCarEngine(req)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }

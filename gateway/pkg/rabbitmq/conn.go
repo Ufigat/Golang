@@ -61,7 +61,7 @@ func (c *Connect) create() error {
 	for cs := range channels {
 		ch, err := c.Conn.Channel()
 		if err != nil {
-			log.Errorln("Test #1 ", err.Error())
+			log.Errorln("create #1 ", err.Error())
 
 			return err
 		}
@@ -77,7 +77,7 @@ func (c *Connect) create() error {
 			nil,          // arguments
 		)
 		if err != nil {
-			log.Errorln("Test #2 ", err.Error())
+			log.Errorln("create #2 ", err.Error())
 
 			return err
 		}
@@ -90,7 +90,6 @@ func (c *Connect) ProduceMessage(message []byte, channelName string, queueName s
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	fmt.Println("c.QueueChannel[channelName]      ", c.QueueChannel[channelName])
 	err := c.QueueChannel[channelName].Channel.PublishWithContext(ctx,
 		"",                         // exchange
 		c.QueueMap[queueName].Name, // routing key
@@ -121,6 +120,8 @@ func (c *Connect) ConsumeMessage(channelName string, queueName string) {
 	)
 	if err != nil {
 		log.Errorln(fmt.Sprintln("ConsumeMessage error:  ", channelName, queueName), err.Error())
+
+		return
 	}
 
 	c.QueueChannel[channelName].DeliveryChan = messages

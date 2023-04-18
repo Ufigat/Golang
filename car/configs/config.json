@@ -4,7 +4,7 @@
     },
     "postgresql": {
         "host": "localhost",
-        "port": 5431,
+        "port": 5432,
         "user": "postgres",
         "password": "password",
         "dbname": "car"
@@ -12,15 +12,27 @@
     "rabbit" : {
         "host": "localhost",
         "port": ":5672/",
-        "user": "rmuser:",
-        "password": "rmpassword@"
+        "user": "guest:",
+        "password": "guest@"
     },
     "channels" : [
         "GetCar",
-        "SendCar"
+        "SendCar",
+        "GetCars",
+        "SendCars",
+        "GetCarEngine",
+        "SendCarEngine",
+        "GetCarEngines",
+        "SendCarEngines"
     ],
     "queue" : [
         "GetCar",
-        "SendCar"
+        "SendCar",
+        "GetCars",
+        "SendCars",
+        "GetCarEngine",
+        "SendCarEngine",
+        "GetCarEngines",
+        "SendCarEngines"
     ]
 }

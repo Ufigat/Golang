@@ -16,52 +16,26 @@ import (
 type Connect struct {
 	Conn *amqp.Connection
 
-	Queue *Queue
+	QueueMap map[string]amqp.Queue
 
-	Channel *Channel
-}
-
-type Queue struct {
-	EnginesQueue amqp.Queue
-
-	SendEnginesQueue amqp.Queue
-
-	EngineQueue amqp.Queue
-
-	SendEngineQueue amqp.Queue
-}
-
-type Channel struct {
-	EnginesChan *amqp.Channel
-
-	SendEnginesChan *amqp.Channel
-
-	EngineChan *amqp.Channel
-
-	SendEngineChan *amqp.Channel
+	QueueChannel map[string]*Consumer
 }
 
 func NewConnect() *Connect {
 	return &Connect{
-		Conn: &amqp.Connection{},
-		Queue: &Queue{
-			EnginesQueue:     amqp.Queue{},
-			SendEnginesQueue: amqp.Queue{},
-			EngineQueue:      amqp.Queue{},
-			SendEngineQueue:  amqp.Queue{},
-		},
-		Channel: &Channel{
-			EnginesChan:     &amqp.Channel{},
-			SendEnginesChan: &amqp.Channel{},
-			EngineChan:      &amqp.Channel{},
-			SendEngineChan:  &amqp.Channel{},
-		},
+		Conn:         &amqp.Connection{},
+		QueueMap:     map[string]amqp.Queue{},
+		QueueChannel: map[string]*Consumer{},
 	}
+}
+
+type Consumer struct {
+	Channel      *amqp.Channel
+	DeliveryChan <-chan amqp.Delivery
 }
 
 func ConnRabbit(c *Connect) error {
 	var err error
-
 	rabbitInfo := fmt.Sprint("amqp://", viper.GetString("rabbit.user"),
 		viper.GetString("rabbit.password"), viper.GetString("rabbit.host"), viper.GetString("rabbit.port"))
 
@@ -72,7 +46,7 @@ func ConnRabbit(c *Connect) error {
 		return err
 	}
 
-	err = c.Create()
+	err = c.create()
 	if err != nil {
 		log.Errorln("ConnRabbit #1 ", err.Error())
 
@@ -82,76 +56,60 @@ func ConnRabbit(c *Connect) error {
 	return nil
 }
 
-func (c *Connect) Create() error {
-	var err error
+func (c *Connect) create() error {
+	channels := viper.GetStringSlice("channels")
+	queues := viper.GetStringSlice("queue")
 
-	c.Channel.EnginesChan, err = c.Conn.Channel()
-	if err != nil {
-		log.Errorln("Create #1 ", err.Error())
+	for cs := range channels {
+		ch, err := c.Conn.Channel()
+		if err != nil {
+			log.Errorln("create #1 ", err.Error())
 
-		return err
-	}
+			return err
+		}
 
-	c.Queue.EnginesQueue, err = c.Channel.EnginesChan.QueueDeclare(
-		"GetEngines", // name
-		false,        // durable
-		false,        // delete when unused
-		false,        // exclusive
-		false,        // no-wait
-		nil,          // arguments
-	)
-	if err != nil {
-		log.Errorln("Create #2 ", err.Error())
+		c.QueueChannel[channels[cs]] = &Consumer{Channel: ch, DeliveryChan: make(chan amqp.Delivery)}
 
-		return err
-	}
+		c.QueueMap[queues[cs]], err = ch.QueueDeclare(
+			channels[cs], // name
+			false,        // durable
+			false,        // delete when unused
+			false,        // exclusive
+			false,        // no-wait
+			nil,          // arguments
+		)
+		if err != nil {
+			log.Errorln("create #2 ", err.Error())
 
-	c.Channel.SendEnginesChan, err = c.Conn.Channel()
-	if err != nil {
-		log.Errorln("Create #3 ", err.Error())
-
-		return err
-	}
-
-	c.Queue.SendEnginesQueue, err = c.Channel.SendEnginesChan.QueueDeclare(
-		"SendEngines", // name
-		false,         // durable
-		false,         // delete when unused
-		false,         // exclusive
-		false,         // no-wait
-		nil,           // arguments
-	)
-	if err != nil {
-		log.Errorln("Create #4 ", err.Error())
-
-		return err
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (c *Connect) ProduceSendEngines(resp *util.Response) error {
+func (c *Connect) ProduceMessage(resp *util.Response, channelName string, queueName string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	body, err := json.Marshal(resp)
+	value, err := json.Marshal(resp)
 	if err != nil {
-		fmt.Println(err)
+		log.Errorln("ProduceMessage serialization error: ", err.Error())
 
+		return nil
 	}
 
-	err = c.Channel.SendEnginesChan.PublishWithContext(ctx,
-		"",                            // exchange
-		c.Queue.SendEnginesQueue.Name, // routing key
-		false,                         // mandatory
-		false,                         // immediate
+	err = c.QueueChannel[channelName].Channel.PublishWithContext(ctx,
+		"",                         // exchange
+		c.QueueMap[queueName].Name, // routing key
+		false,                      // mandatory
+		false,                      // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        []byte(value),
 		})
-
 	if err != nil {
-		log.Errorln("GetCarMessage #1 ", err.Error())
+		log.Errorln(fmt.Sprintln("ProduceMessage error:  ", channelName, queueName), err.Error())
 
 		return err
 	}
@@ -159,19 +117,20 @@ func (c *Connect) ProduceSendEngines(resp *util.Response) error {
 	return nil
 }
 
-func (c *Connect) ConsumeEnginesChan() <-chan amqp.Delivery {
-	messages, err := c.Channel.EnginesChan.Consume(
-		c.Queue.EnginesQueue.Name, // queue name
-		"",                        // consumer
-		true,                      // auto-ack
-		false,                     // exclusive
-		false,                     // no local
-		false,                     // no wait
-		nil,                       // arguments
+func (c *Connect) ConsumeMessage(channelName string, queueName string) {
+	messages, err := c.QueueChannel[channelName].Channel.Consume(
+		c.QueueMap[queueName].Name, // queue name
+		"",                         // consumer
+		true,                       // auto-ack
+		false,                      // exclusive
+		false,                      // no local
+		false,                      // no wait
+		nil,                        // arguments
 	)
 	if err != nil {
-		log.Errorln("ConsumeEnginesChan #1 ", err.Error())
+		log.Fatalf(fmt.Sprintln("ConsumeMessage error:  ", channelName, queueName), err.Error())
+
 	}
 
-	return messages
+	c.QueueChannel[channelName].DeliveryChan = messages
 }

@@ -4,7 +4,7 @@
     },
     "postgresql": {
         "host": "localhost",
-        "port": 5431,
+        "port": 5432,
         "user": "postgres",
         "password": "password",
         "dbname": "engine"
@@ -12,7 +12,19 @@
     "rabbit" : {
         "host": "localhost",
         "port": ":5672/",
-        "user": "rmuser:",
-        "password": "rmpassword@"
-    }
+        "user": "guest:",
+        "password": "guest@"
+    },
+    "channels" : [
+        "GetEngines",
+        "GetEngine",
+        "SendEngines",
+        "SendEngine"
+    ],
+    "queue" : [
+        "GetEngines",
+        "GetEngine",
+        "SendEngines",
+        "SendEngine"
+    ]
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func GetCarByUser(carsIDs []int) ([]car.Response, error) {
+func GetCarForUser(carsIDs []int) ([]car.Response, error) {
 	query := `
 		SELECT cars.id, brands.name, colors.name
 			FROM cars
@@ -39,7 +39,7 @@ func GetCarByUser(carsIDs []int) ([]car.Response, error) {
 	return carLinksResp, nil
 }
 
-func GetCarEngineByUser(carsIDs []int) ([]car.Response, error) {
+func GetCarEngineForUser(carsIDs []int) ([]car.Response, error) {
 	query := `
 		SELECT cars.id, cars.engine_id
 			FROM cars

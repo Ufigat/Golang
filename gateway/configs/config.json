@@ -10,20 +10,26 @@
     "rabbit" : {
         "host": "localhost",
         "port": ":5672/",
-        "user": "rmuser:",
-        "password": "rmpassword@"
+        "user": "guest:",
+        "password": "guest@"
     },
     "channels" : [
         "GetCar",
         "SendCar",
+        "GetCarEngine",
+        "SendCarEngine",
         "GetEngines",
+        "GetEngine",
         "SendEngines",
         "SendEngine"
     ],
     "queue" : [
         "GetCar",
         "SendCar",
+        "GetCarEngine",
+        "SendCarEngine",
         "GetEngines",
+        "GetEngine",
         "SendEngines",
         "SendEngine"
     ]
