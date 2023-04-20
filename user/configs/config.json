@@ -4,9 +4,23 @@
     },
     "postgresql": {
         "host": "localhost",
-        "port": 5431,
+        "port": 5432,
         "user": "postgres",
         "password": "password",
         "dbname": "user"
-    }
+    },
+    "rabbit" : {
+        "host": "localhost",
+        "port": ":5672/",
+        "user": "guest:",
+        "password": "guest@"
+    },
+    "channels" : [
+        "GetUserCars",
+        "SendUserCars"
+    ],
+    "queue" : [
+        "GetUserCars",
+        "SendUserCars"
+    ]
 }

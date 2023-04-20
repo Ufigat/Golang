@@ -2,7 +2,8 @@ package main
 
 import (
 	"user/internal/app/routing"
-	database "user/pkg/postgres"
+	"user/pkg/postgres"
+	"user/pkg/rabbitmq"
 
 	log "github.com/sirupsen/logrus"
 
@@ -23,13 +24,20 @@ func init() {
 }
 
 func main() {
-	err := database.ConnectDB()
+	err := postgres.ConnectDB()
 	if err != nil {
 		log.Fatalf("fatal DB connect error: %s", err.Error())
 	}
 
+	conn := rabbitmq.NewConnect()
+
+	err = rabbitmq.ConnRabbit(conn)
+	if err != nil {
+		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
+	}
+
 	e := echo.New()
-	routing.InitRoutes(e)
+	routing.Init(conn)
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 }

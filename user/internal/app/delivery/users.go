@@ -1,39 +1,72 @@
 package delivery
 
 import (
-	"net/http"
-	"strconv"
+	"encoding/json"
+	"fmt"
 	"user/internal/app/infrastructure/repository"
+	"user/pkg/rabbitmq"
 	"user/pkg/request/user"
 	"user/pkg/response/fault"
 	"user/pkg/util"
 
-	"github.com/labstack/echo/v4"
-
 	log "github.com/sirupsen/logrus"
 )
 
-func GetUserCars(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		log.Errorln("GetUserCars #1", err.Error())
+type User struct {
+	Conn *rabbitmq.Connect
+}
 
-		return c.JSON(http.StatusBadRequest, &util.Response{Error: fault.NewResponse(err.Error())})
+func (u *User) GetUserCars() {
+	for d := range u.Conn.QueueChannel["GetUserCars"].DeliveryChan {
+		var userID int
+
+		err := json.Unmarshal(d.Body, &userID)
+		if err != nil {
+			log.Errorln("GetUserCars #1 ", err.Error())
+
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			if err != nil {
+				log.Fatalf("GetUserCars #2 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		err = user.ValidationID(userID)
+		if err != nil {
+			log.Infoln("GetUserCars #3 ", err.Error())
+
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			if err != nil {
+				log.Fatalf("GetUserCars #4 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		resp, err := repository.GetUser(userID)
+		if err != nil {
+			log.Errorln("GetUserCars #5 ", err.Error())
+
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			if err != nil {
+				log.Fatalf("GetUserCars #6 ", err.Error())
+
+				break
+			}
+			continue
+		}
+
+		aaa := &util.Response{Data: resp}
+		fmt.Println(aaa)
+
+		err = u.Conn.ProduceMessage(&util.Response{Data: resp}, "SendUserCars", "SendUserCars")
+		if err != nil {
+			log.Fatalf("GetUserCars #7 ", err.Error())
+
+			break
+		}
 	}
-
-	err = user.ValidationID(userID)
-	if err != nil {
-		log.Infoln("GetUserCars #2", err.Error())
-
-		return c.JSON(http.StatusUnprocessableEntity, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	resp, err := repository.GetUser(userID)
-	if err != nil {
-		log.Infoln("GetUserCars #3", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
-	}
-
-	return c.JSON(http.StatusOK, &util.Response{Data: resp})
 }

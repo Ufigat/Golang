@@ -21,7 +21,11 @@
         "GetEngines",
         "GetEngine",
         "SendEngines",
-        "SendEngine"
+        "SendEngine",
+        "GetUserCars",
+        "SendUserCars",
+        "GetCars",
+        "SendCars"
     ],
     "queue" : [
         "GetCar",
@@ -31,6 +35,10 @@
         "GetEngines",
         "GetEngine",
         "SendEngines",
-        "SendEngine"
+        "SendEngine",
+        "GetUserCars",
+        "SendUserCars",
+        "GetCars",
+        "SendCars"
     ]
 }

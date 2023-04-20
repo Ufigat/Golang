@@ -1,25 +1,17 @@
 package routing
 
 import (
-	"encoding/json"
 	"user/internal/app/delivery"
-
-	"github.com/labstack/echo/v4"
-	log "github.com/sirupsen/logrus"
+	"user/pkg/rabbitmq"
 )
 
-func InitRoutes(e *echo.Echo) {
-	us := e.Group("/user")
-	us.GET("/:id/cars", delivery.GetUserCars)
+func Init(c *rabbitmq.Connect) {
+	createConsumers(c)
 
-	showRoutes(e)
+	u := &delivery.User{Conn: c}
+	go u.GetUserCars()
 }
 
-func showRoutes(e *echo.Echo) {
-	data, err := json.MarshalIndent(e.Routes(), "", "  ")
-	if err != nil {
-		log.Fatal("fatal error parsing routes")
-	}
-
-	log.Infoln(string(data))
+func createConsumers(c *rabbitmq.Connect) {
+	c.ConsumeMessage("GetUserCars", "GetUserCars")
 }

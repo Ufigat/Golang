@@ -52,7 +52,6 @@ func (c *Client) WritePump() {
 	for {
 		select {
 		case message, ok := <-c.Send:
-			fmt.Println("message", message)
 			if !ok {
 				break
 			}

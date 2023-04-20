@@ -13,12 +13,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Delivery struct {
+type Car struct {
 	Conn *rabbitmq.Connect
 	Room *websocket.Room
 }
 
-func (d *Delivery) GetCarEnginesByBrand(c echo.Context) error {
+func (car *Car) GetCarEnginesByBrand(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("client"))
 	if err != nil {
 		log.Errorln("GetCarEnginesByBrand #1 ", err.Error())
@@ -26,13 +26,13 @@ func (d *Delivery) GetCarEnginesByBrand(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	usecase := usecase.Usacase{Room: d.Room, Conn: d.Conn}
+	usecase := usecase.Usacase{Room: car.Room, Conn: car.Conn}
 	go usecase.GetCarEnginesByBrand(userID, c.Param("brand"))
 
 	return c.JSON(http.StatusOK, &util.Response{Data: "request in processing"})
 }
 
-func (d *Delivery) GetCarEngine(c echo.Context) error {
+func (car *Car) GetCarEngine(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("client"))
 	if err != nil {
 		log.Errorln("GetCarEngine #1 ", err.Error())
@@ -40,7 +40,7 @@ func (d *Delivery) GetCarEngine(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	usecase := usecase.Usacase{Room: d.Room, Conn: d.Conn}
+	usecase := usecase.Usacase{Room: car.Room, Conn: car.Conn}
 	go usecase.GetCarEngine(userID, c.Param("car"))
 
 	return c.JSON(http.StatusOK, &util.Response{Data: "request in processing"})

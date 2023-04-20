@@ -25,6 +25,6 @@ type Response struct {
 }
 
 type DataResponse struct {
-	Data  Response        `json:"data"`
+	Data  *Response       `json:"data"`
 	Error *fault.Response `json:"error"`
 }

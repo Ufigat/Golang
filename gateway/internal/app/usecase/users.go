@@ -2,92 +2,98 @@ package usecase
 
 import (
 	"encoding/json"
+	"fmt"
 
+	carReq "gateway/pkg/request/car"
 	"gateway/pkg/response/car"
 	"gateway/pkg/response/engine"
 	"gateway/pkg/response/fault"
+	"gateway/pkg/response/user"
 	"gateway/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func (u *Usacase) GetUserCars(clientID int, brand string) {
+func (u *Usacase) GetUserCars(clientID int, userID string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(brand), "GetCar", "GetCar")
+	err := u.Conn.ProduceMessage([]byte(userID), "GetUserCars", "GetUserCars")
 	if err != nil {
-		log.Errorln("GetCarsEngineByBrand #1 ", err.Error())
+		log.Errorln("GetUserCars #1 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
-	msgSendCar := <-u.Conn.QueueChannel["SendCar"].DeliveryChan
+	msgSendUserCars := <-u.Conn.QueueChannel["SendUserCars"].DeliveryChan
 
-	var carsByBrandResp car.DataResponse
+	var userResp user.DataResponse
 
-	err = json.Unmarshal(msgSendCar.Body, &carsByBrandResp)
+	fmt.Println(string(msgSendUserCars.Body))
+
+	err = json.Unmarshal(msgSendUserCars.Body, &userResp)
 	if err != nil {
-		log.Errorln("GetCarsEngineByBrand #2 ", err.Error())
+		log.Errorln("GetUserCars #2 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
-	if carsByBrandResp.Error != nil {
-		log.Errorln("GetCarsEngineByBrand #3 ", carsByBrandResp.Error.Message)
+	fmt.Println("userr resp user resp", userResp)
 
-		client.Send <- &util.Response{Error: carsByBrandResp.Error}
+	if userResp.Error != nil {
+		log.Errorln("GetUserCars #3 ", userResp.Error.Message)
+
+		client.Send <- &util.Response{Error: userResp.Error}
 		return
 	}
 
-	var engineIDs []int
+	carReq := &carReq.CarsRequest{CarsIDs: userResp.Data.CarIDs}
 
-	for i := range carsByBrandResp.Data {
-		engineIDs = append(engineIDs, carsByBrandResp.Data[i].EngineID)
-	}
-
-	value, err := json.Marshal(engineIDs)
+	value, err := json.Marshal(carReq)
 	if err != nil {
-		log.Errorln("CarEngines #1 ", err.Error())
+		log.Errorln("GetUserCars #1 ", err.Error())
 
-		client.Send <- &util.Response{Error: carsByBrandResp.Error}
+		client.Send <- &util.Response{Error: userResp.Error}
 		return
 	}
 
-	err = u.Conn.ProduceMessage(value, "GetEngines", "GetEngines")
+	err = u.Conn.ProduceMessage(value, "GetCars", "GetCars")
 	if err != nil {
-		log.Errorln("GetCarsEngineByBrand #4 ", err.Error())
+		log.Errorln("GetUserCars #4 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
-	msgSendEngines := <-u.Conn.QueueChannel["SendEngines"].DeliveryChan
+	msgSendCars := <-u.Conn.QueueChannel["SendCars"].DeliveryChan
 
-	var engineResp engine.DataResponse
+	var carResp car.DataResponse
 
-	err = json.Unmarshal(msgSendEngines.Body, &engineResp)
+	fmt.Println(string(msgSendCars.Body))
+
+	err = json.Unmarshal(msgSendCars.Body, &carResp)
 	if err != nil {
-		log.Errorln("GetCarsEngineByBrand #5 ", err.Error())
+		log.Errorln("GetUserCars #5 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
-	if engineResp.Error != nil {
-		log.Errorln("GetCarsEngineByBrand #6 ", engineResp.Error.Error())
+	if carResp.Error != nil {
+		log.Errorln("GetUserCars #6 ", carResp.Error.Error())
 
-		client.Send <- &util.Response{Error: engineResp.Error}
+		client.Send <- &util.Response{Error: carResp.Error}
 		return
 	}
 
-	carEngineByBrandResp := &engine.ByBrandResponse{
-		Brand:   brand,
-		Engines: engineResp.Data,
+	userCarsResp := &user.UserCarsResponse{
+		ID:   userResp.Data.ID,
+		Name: userResp.Data.Name,
+		Cars: carResp.Data,
 	}
 
-	client.Send <- &util.Response{Data: carEngineByBrandResp}
+	client.Send <- &util.Response{Data: userCarsResp}
 }
 
 func (u *Usacase) GetUserEngines(clientID int, carID string) {
@@ -159,6 +165,11 @@ func (u *Usacase) GetUserEngines(clientID int, carID string) {
 		ID:     carID,
 		Engine: engineResp.Data,
 	}
+	// userEnginesResp := &user.UserEnginesResponse{
+	// 	ID:      userDataResp.Data.ID,
+	// 	Name:    userDataResp.Data.Name,
+	// 	Engines: engineResp.Data,
+	// }
 
 	client.Send <- &util.Response{Data: carEngineResp}
 }

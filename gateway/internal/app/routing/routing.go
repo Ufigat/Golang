@@ -23,6 +23,8 @@ func createConsumers(c *rabbitmq.Connect) {
 	c.ConsumeMessage("SendEngines", "SendEngines")
 	c.ConsumeMessage("SendCarEngine", "SendCarEngine")
 	c.ConsumeMessage("SendEngine", "SendEngine")
+	c.ConsumeMessage("SendUserCars", "SendUserCars")
+	c.ConsumeMessage("SendCars", "SendCars")
 }
 
 func initWs(e *echo.Echo, wr *websocket.Room) {
@@ -33,15 +35,17 @@ func initWs(e *echo.Echo, wr *websocket.Room) {
 }
 
 func initHttp(e *echo.Echo, r *rabbitmq.Connect, wr *websocket.Room) {
-	d := &delivery.Delivery{Conn: r, Room: wr}
+	c := &delivery.Car{Conn: r, Room: wr}
+
+	u := &delivery.User{Conn: r, Room: wr}
 
 	us := e.Group("/user/:client/:id")
-	us.GET("/cars", delivery.GetUserCars)
-	us.GET("/engines", delivery.GetUserEngines)
+	us.GET("/cars", u.GetUserCars)
+	us.GET("/engines", u.GetUserEngines)
 
 	ca := e.Group("/cars/:client")
-	ca.GET("/:brand/engines-brand", d.GetCarEnginesByBrand)
-	ca.GET("/:car/engine", d.GetCarEngine)
+	ca.GET("/:brand/engines-brand", c.GetCarEnginesByBrand)
+	ca.GET("/:car/engine", c.GetCarEngine)
 }
 
 func showRoutes(e *echo.Echo) {
