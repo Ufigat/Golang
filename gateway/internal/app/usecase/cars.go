@@ -21,7 +21,7 @@ type Usacase struct {
 func (u *Usacase) GetCarEnginesByBrand(clientID int, brand string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(brand), "GetCar", "GetCar")
+	err := u.Conn.ProduceMessage([]byte(brand), "GetCar", "GetCar", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetCarsEngineByBrand #1 ", err.Error())
 
@@ -62,7 +62,7 @@ func (u *Usacase) GetCarEnginesByBrand(clientID int, brand string) {
 		return
 	}
 
-	err = u.Conn.ProduceMessage(value, "GetEngines", "GetEngines")
+	err = u.Conn.ProduceMessage(value, "GetEngines", "GetEngines", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetCarsEngineByBrand #4 ", err.Error())
 
@@ -100,7 +100,7 @@ func (u *Usacase) GetCarEnginesByBrand(clientID int, brand string) {
 func (u *Usacase) GetCarEngine(clientID int, carID string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(carID), "GetCarEngine", "GetCarEngine")
+	err := u.Conn.ProduceMessage([]byte(carID), "GetCarEngine", "GetCarEngine", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetCarEngine #1 ", err.Error())
 
@@ -135,7 +135,7 @@ func (u *Usacase) GetCarEngine(clientID int, carID string) {
 		return
 	}
 
-	err = u.Conn.ProduceMessage(value, "GetEngine", "GetEngine")
+	err = u.Conn.ProduceMessage(value, "GetEngine", "GetEngine", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetCarEngine #5 ", err.Error())
 

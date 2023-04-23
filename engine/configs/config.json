@@ -26,5 +26,11 @@
         "GetEngine",
         "SendEngines",
         "SendEngine"
+    ],
+    "queues" : [
+        {"name": "GetEngines", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendEngines", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}}
     ]
 }

@@ -16,8 +16,8 @@ func Init(c *rabbitmq.Connect) {
 }
 
 func createConsumers(c *rabbitmq.Connect) {
-	c.ConsumeMessage("GetCar", "GetCar")
-	c.ConsumeMessage("GetCars", "GetCars")
-	c.ConsumeMessage("GetCarEngine", "GetCarEngine")
-	c.ConsumeMessage("GetCarEngines", "GetCarEngines")
+	c.ConsumeMessage("GetCar", "GetCar", "", true, false, false, false, nil)
+	c.ConsumeMessage("GetCars", "GetCars", "", true, false, false, false, nil)
+	c.ConsumeMessage("GetCarEngine", "GetCarEngine", "", true, false, false, false, nil)
+	c.ConsumeMessage("GetCarEngines", "GetCarEngines", "", true, false, false, false, nil)
 }

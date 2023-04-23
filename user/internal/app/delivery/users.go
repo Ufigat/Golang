@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"encoding/json"
-	"fmt"
 	"user/internal/app/infrastructure/repository"
 	"user/pkg/rabbitmq"
 	"user/pkg/request/user"
@@ -24,7 +23,14 @@ func (u *User) GetUserCars() {
 		if err != nil {
 			log.Errorln("GetUserCars #1 ", err.Error())
 
-			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendUserCars",
+				"SendUserCars",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetUserCars #2 ", err.Error())
 
@@ -37,7 +43,14 @@ func (u *User) GetUserCars() {
 		if err != nil {
 			log.Infoln("GetUserCars #3 ", err.Error())
 
-			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendUserCars",
+				"SendUserCars",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetUserCars #4 ", err.Error())
 
@@ -50,7 +63,13 @@ func (u *User) GetUserCars() {
 		if err != nil {
 			log.Errorln("GetUserCars #5 ", err.Error())
 
-			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendUserCars", "SendUserCars")
+			err = u.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendUserCars",
+				"SendUserCars",
+				"",
+				false,
+				false,
+				"text/plain")
 			if err != nil {
 				log.Fatalf("GetUserCars #6 ", err.Error())
 
@@ -59,10 +78,14 @@ func (u *User) GetUserCars() {
 			continue
 		}
 
-		aaa := &util.Response{Data: resp}
-		fmt.Println(aaa)
-
-		err = u.Conn.ProduceMessage(&util.Response{Data: resp}, "SendUserCars", "SendUserCars")
+		err = u.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendUserCars",
+			"SendUserCars",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetUserCars #7 ", err.Error())
 

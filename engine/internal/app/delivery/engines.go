@@ -24,7 +24,14 @@ func (e *Engine) GetEngines() {
 		if err != nil {
 			log.Errorln("GetEngines #1 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngines",
+				"SendEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngines #2 ", err.Error())
 
@@ -37,7 +44,14 @@ func (e *Engine) GetEngines() {
 		if err != nil {
 			log.Infoln("GetEngines #3 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngines",
+				"SendEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngines #4 ", err.Error())
 
@@ -50,7 +64,14 @@ func (e *Engine) GetEngines() {
 		if err != nil {
 			log.Errorln("GetEngines #5 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngines", "SendEngines")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngines",
+				"SendEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngines #6 ", err.Error())
 
@@ -59,7 +80,14 @@ func (e *Engine) GetEngines() {
 			continue
 		}
 
-		err = e.Conn.ProduceMessage(&util.Response{Data: resp}, "SendEngines", "SendEngines")
+		err = e.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendEngines",
+			"SendEngines",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetEngines #7 ", err.Error())
 
@@ -74,7 +102,14 @@ func (e *Engine) GetEngine() {
 		if err != nil {
 			log.Errorln("GetEngine #1 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngine",
+				"SendEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngine #2 ", err.Error())
 
@@ -87,7 +122,14 @@ func (e *Engine) GetEngine() {
 		if err != nil {
 			log.Infoln("GetEngine #3 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngine",
+				"SendEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngine #4 ", err.Error())
 
@@ -100,7 +142,14 @@ func (e *Engine) GetEngine() {
 		if err != nil {
 			log.Errorln("GetEngine #5 ", err.Error())
 
-			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendEngine", "SendEngine")
+			err = e.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendEngine",
+				"SendEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetEngine #6 ", err.Error())
 
@@ -109,7 +158,14 @@ func (e *Engine) GetEngine() {
 			continue
 		}
 
-		err = e.Conn.ProduceMessage(&util.Response{Data: response}, "SendEngine", "SendEngine")
+		err = e.Conn.ProduceMessage(&util.Response{Data: response},
+			"SendEngine",
+			"SendEngine",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetEngine #7 ", err.Error())
 

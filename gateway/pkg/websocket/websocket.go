@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"fmt"
 	"gateway/pkg/util"
 	"log"
 
@@ -14,6 +13,8 @@ var Upgrader = websocket.Upgrader{
 }
 
 type Client struct {
+	Room *Room
+
 	Conn *websocket.Conn
 
 	Send chan *util.Response
@@ -24,7 +25,21 @@ type Client struct {
 }
 
 type Room struct {
-	Clients map[int]*Client
+	Unregister chan *Client
+	Register   chan *Client
+	Clients    map[int]*Client
+}
+
+func (r *Room) Work() {
+
+	for {
+		select {
+		case client := <-r.Register:
+			r.Clients[client.ID] = client
+		case client := <-r.Unregister:
+			delete(r.Clients, client.ID)
+		}
+	}
 }
 
 func (c *Client) ReadPump() {
@@ -36,6 +51,8 @@ func (c *Client) ReadPump() {
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("readPump close: %v", err)
+
+				c.Room.Unregister <- c
 			}
 			break
 		}
@@ -47,7 +64,6 @@ func (c *Client) WritePump() {
 		c.Conn.Close()
 		close(c.WritePumpClose)
 		close(c.Send)
-		fmt.Println("connection close")
 	}()
 	for {
 		select {
@@ -61,7 +77,6 @@ func (c *Client) WritePump() {
 			}
 
 		case <-c.WritePumpClose:
-			fmt.Println("defer after ReadPump")
 			return
 		}
 	}

@@ -27,18 +27,18 @@
         "GetCars",
         "SendCars"
     ],
-    "queue" : [
-        "GetCar",
-        "SendCar",
-        "GetCarEngine",
-        "SendCarEngine",
-        "GetEngines",
-        "GetEngine",
-        "SendEngines",
-        "SendEngine",
-        "GetUserCars",
-        "SendUserCars",
-        "GetCars",
-        "SendCars"
+    "queues" : [
+        {"name": "GetCar", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendCar", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetCarEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendCarEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetEngines", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendEngines", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendEngine", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetUserCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendUserCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "GetCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}}
     ]
 }

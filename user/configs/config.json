@@ -19,8 +19,8 @@
         "GetUserCars",
         "SendUserCars"
     ],
-    "queue" : [
-        "GetUserCars",
-        "SendUserCars"
+    "queues" : [
+        {"name": "GetUserCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}},
+        {"name": "SendUserCars", "durable":false, "delete":false, "exclusive": false, "nowait":false, "args": {}}
     ]
 }

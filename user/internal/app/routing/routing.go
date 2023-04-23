@@ -13,5 +13,5 @@ func Init(c *rabbitmq.Connect) {
 }
 
 func createConsumers(c *rabbitmq.Connect) {
-	c.ConsumeMessage("GetUserCars", "GetUserCars")
+	c.ConsumeMessage("GetUserCars", "GetUserCars", "", true, false, false, false, nil)
 }

@@ -30,8 +30,20 @@ func main() {
 		log.Fatalf("fatal rabbitmq connect error: %s", err.Error())
 	}
 
+	ws := &websocket.Room{Clients: make(map[int]*websocket.Client),
+		Register:   make(chan *websocket.Client),
+		Unregister: make(chan *websocket.Client),
+	}
+
+	go ws.Work()
+
+	defer func() {
+		close(ws.Register)
+		close(ws.Unregister)
+	}()
+
 	e := echo.New()
-	routing.InitRoutes(e, conn, &websocket.Room{Clients: make(map[int]*websocket.Client)})
+	routing.InitRoutes(e, conn, ws)
 
 	e.Logger.Fatal(e.Start(viper.GetString("app.port")))
 }

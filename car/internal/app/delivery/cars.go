@@ -24,7 +24,14 @@ func (c *Car) GetCars() {
 
 		err := json.Unmarshal(dc.Body, &carsIDs)
 		if err != nil {
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCars",
+				"SendCars",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCars #1 ", err.Error())
 
@@ -37,7 +44,14 @@ func (c *Car) GetCars() {
 		if err != nil {
 			log.Errorln("GetCars #2 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCars",
+				"SendCars",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCars #3 ", err.Error())
 
@@ -50,7 +64,14 @@ func (c *Car) GetCars() {
 		if err != nil {
 			log.Errorln("GetCars #4 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCars", "SendCars")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCars",
+				"SendCars",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCars #5 ", err.Error())
 
@@ -59,7 +80,14 @@ func (c *Car) GetCars() {
 			continue
 		}
 
-		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCars", "SendCars")
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendCars",
+			"SendCars",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetCars #6 ", err.Error())
 
@@ -75,7 +103,14 @@ func (c *Car) GetCarEngines() {
 
 		err := json.Unmarshal(dc.Body, &carsIDs)
 		if err != nil {
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngines",
+				"SendCarEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngines #1 ", err.Error())
 
@@ -88,7 +123,14 @@ func (c *Car) GetCarEngines() {
 		if err != nil {
 			log.Errorln("GetCarEngines #2 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngines",
+				"SendCarEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngines #3 ", err.Error())
 
@@ -101,7 +143,14 @@ func (c *Car) GetCarEngines() {
 		if err != nil {
 			log.Errorln("GetCarEngines #4 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngines", "SendCarEngines")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngines",
+				"SendCarEngines",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngines #5 ", err.Error())
 
@@ -110,7 +159,14 @@ func (c *Car) GetCarEngines() {
 			continue
 		}
 
-		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCarEngines", "SendCarEngines")
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendCarEngines",
+			"SendCarEngines",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetCarEngines #6 ", err.Error())
 
@@ -130,7 +186,14 @@ func (c *Car) GetCarsByBrand() {
 		if err != nil {
 			log.Errorln("GetCarsByBrand #1 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCar", "SendCar")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCar",
+				"SendCar",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarsByBrand #2 ", err.Error())
 
@@ -143,7 +206,14 @@ func (c *Car) GetCarsByBrand() {
 		if err != nil {
 			log.Errorln("GetCarsByBrand #3 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCar", "SendCar")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCar",
+				"SendCar",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarsByBrand #4 ", err.Error())
 
@@ -152,7 +222,14 @@ func (c *Car) GetCarsByBrand() {
 			continue
 		}
 
-		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCar", "SendCar")
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendCar",
+			"SendCar",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetCarsByBrand #5 ", err.Error())
 
@@ -168,7 +245,14 @@ func (c *Car) GetCarEngine() {
 		if err != nil {
 			log.Errorln("GetCarEngine #1 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngine",
+				"SendCarEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngine #2 ", err.Error())
 
@@ -185,7 +269,14 @@ func (c *Car) GetCarEngine() {
 		if err != nil {
 			log.Errorln("GetCarEngine #3 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngine",
+				"SendCarEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngine #4 ", err.Error())
 
@@ -198,7 +289,14 @@ func (c *Car) GetCarEngine() {
 		if err != nil {
 			log.Errorln("GetCarEngine #5 ", err.Error())
 
-			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())}, "SendCarEngine", "SendCarEngine")
+			err = c.Conn.ProduceMessage(&util.Response{Error: fault.NewResponse(err.Error())},
+				"SendCarEngine",
+				"SendCarEngine",
+				"",
+				false,
+				false,
+				"text/plain",
+			)
 			if err != nil {
 				log.Fatalf("GetCarEngine #6 ", err.Error())
 
@@ -207,7 +305,14 @@ func (c *Car) GetCarEngine() {
 			continue
 		}
 
-		err = c.Conn.ProduceMessage(&util.Response{Data: resp}, "SendCarEngine", "SendCarEngine")
+		err = c.Conn.ProduceMessage(&util.Response{Data: resp},
+			"SendCarEngine",
+			"SendCarEngine",
+			"",
+			false,
+			false,
+			"text/plain",
+		)
 		if err != nil {
 			log.Fatalf("GetCarEngine #7 ", err.Error())
 

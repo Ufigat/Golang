@@ -19,12 +19,12 @@ func InitRoutes(e *echo.Echo, r *rabbitmq.Connect, wr *websocket.Room) {
 }
 
 func createConsumers(c *rabbitmq.Connect) {
-	c.ConsumeMessage("SendCar", "SendCar")
-	c.ConsumeMessage("SendEngines", "SendEngines")
-	c.ConsumeMessage("SendCarEngine", "SendCarEngine")
-	c.ConsumeMessage("SendEngine", "SendEngine")
-	c.ConsumeMessage("SendUserCars", "SendUserCars")
-	c.ConsumeMessage("SendCars", "SendCars")
+	c.ConsumeMessage("SendCar", "SendCar", "", true, false, false, false, nil)
+	c.ConsumeMessage("SendEngines", "SendEngines", "", true, false, false, false, nil)
+	c.ConsumeMessage("SendCarEngine", "SendCarEngine", "", true, false, false, false, nil)
+	c.ConsumeMessage("SendEngine", "SendEngine", "", true, false, false, false, nil)
+	c.ConsumeMessage("SendUserCars", "SendUserCars", "", true, false, false, false, nil)
+	c.ConsumeMessage("SendCars", "SendCars", "", true, false, false, false, nil)
 }
 
 func initWs(e *echo.Echo, wr *websocket.Room) {

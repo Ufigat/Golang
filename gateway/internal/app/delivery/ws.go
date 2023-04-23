@@ -19,6 +19,7 @@ func (w *Ws) WsConnect(c echo.Context) error {
 	clientID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Errorln("WsConnect #1 ", err.Error())
+
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
@@ -29,9 +30,13 @@ func (w *Ws) WsConnect(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &util.Response{Error: fault.NewResponse(err.Error())})
 	}
 
-	client := &websocket.Client{Conn: conn, Send: make(chan *util.Response), WritePumpClose: make(chan bool), ID: clientID}
+	client := &websocket.Client{Conn: conn,
+		Send:           make(chan *util.Response),
+		WritePumpClose: make(chan bool),
+		ID:             clientID, Room: w.Room,
+	}
 
-	w.Room.Clients[clientID] = client
+	w.Room.Register <- client
 
 	go client.ReadPump()
 	go client.WritePump()

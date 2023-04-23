@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"encoding/json"
-	"fmt"
 
 	carReq "gateway/pkg/request/car"
 	"gateway/pkg/response/car"
@@ -17,7 +16,7 @@ import (
 func (u *Usacase) GetUserCars(clientID int, userID string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(userID), "GetUserCars", "GetUserCars")
+	err := u.Conn.ProduceMessage([]byte(userID), "GetUserCars", "GetUserCars", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetUserCars #1 ", err.Error())
 
@@ -29,8 +28,6 @@ func (u *Usacase) GetUserCars(clientID int, userID string) {
 
 	var userResp user.DataResponse
 
-	fmt.Println(string(msgSendUserCars.Body))
-
 	err = json.Unmarshal(msgSendUserCars.Body, &userResp)
 	if err != nil {
 		log.Errorln("GetUserCars #2 ", err.Error())
@@ -38,8 +35,6 @@ func (u *Usacase) GetUserCars(clientID int, userID string) {
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
-
-	fmt.Println("userr resp user resp", userResp)
 
 	if userResp.Error != nil {
 		log.Errorln("GetUserCars #3 ", userResp.Error.Message)
@@ -58,7 +53,7 @@ func (u *Usacase) GetUserCars(clientID int, userID string) {
 		return
 	}
 
-	err = u.Conn.ProduceMessage(value, "GetCars", "GetCars")
+	err = u.Conn.ProduceMessage(value, "GetCars", "GetCars", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetUserCars #4 ", err.Error())
 
@@ -69,8 +64,6 @@ func (u *Usacase) GetUserCars(clientID int, userID string) {
 	msgSendCars := <-u.Conn.QueueChannel["SendCars"].DeliveryChan
 
 	var carResp car.DataResponse
-
-	fmt.Println(string(msgSendCars.Body))
 
 	err = json.Unmarshal(msgSendCars.Body, &carResp)
 	if err != nil {
@@ -96,22 +89,22 @@ func (u *Usacase) GetUserCars(clientID int, userID string) {
 	client.Send <- &util.Response{Data: userCarsResp}
 }
 
-func (u *Usacase) GetUserEngines(clientID int, carID string) {
+func (u *Usacase) GetUserEngines(clientID int, userID string) {
 	client := u.Room.Clients[clientID]
 
-	err := u.Conn.ProduceMessage([]byte(carID), "GetUserEngines", "GetUserEngines")
+	err := u.Conn.ProduceMessage([]byte(userID), "GetUserCars", "GetUserCars", "", false, false, "text/plain")
 	if err != nil {
-		log.Errorln("GetUserEngines #1 ", err.Error())
+		log.Errorln("GetUserCars #1 ", err.Error())
 
 		client.Send <- &util.Response{Error: fault.NewResponse(err.Error())}
 		return
 	}
 
-	msgSendCar := <-u.Conn.QueueChannel["SendCarEngine"].DeliveryChan
+	msgSendCar := <-u.Conn.QueueChannel["SendUserCars"].DeliveryChan
 
-	var carResp car.CarEngineResponse
+	var userResp user.DataResponse
 
-	err = json.Unmarshal(msgSendCar.Body, &carResp)
+	err = json.Unmarshal(msgSendCar.Body, &userResp)
 	if err != nil {
 		log.Errorln("GetUserEngines #2 ", err.Error())
 
@@ -119,22 +112,22 @@ func (u *Usacase) GetUserEngines(clientID int, carID string) {
 		return
 	}
 
-	if carResp.Error != nil {
-		log.Errorln("GetUserEngines #3 ", carResp.Error.Message)
+	if userResp.Error != nil {
+		log.Errorln("GetUserEngines #3 ", userResp.Error.Message)
 
-		client.Send <- &util.Response{Error: carResp.Error}
+		client.Send <- &util.Response{Error: userResp.Error}
 		return
 	}
 
-	value, err := json.Marshal(carResp.Data.EngineID)
+	value, err := json.Marshal(userResp.Data.CarIDs)
 	if err != nil {
 		log.Errorln("GetUserEngines #4 ", err.Error())
 
-		client.Send <- &util.Response{Error: carResp.Error}
+		client.Send <- &util.Response{Error: userResp.Error}
 		return
 	}
 
-	err = u.Conn.ProduceMessage(value, "GetEngine", "GetEngine")
+	err = u.Conn.ProduceMessage(value, "GetEngines", "GetEngines", "", false, false, "text/plain")
 	if err != nil {
 		log.Errorln("GetUserEngines #5 ", err.Error())
 
@@ -142,9 +135,9 @@ func (u *Usacase) GetUserEngines(clientID int, carID string) {
 		return
 	}
 
-	msgSendEngines := <-u.Conn.QueueChannel["SendEngine"].DeliveryChan
+	msgSendEngines := <-u.Conn.QueueChannel["SendEngines"].DeliveryChan
 
-	var engineResp engine.EnigneResponse
+	var engineResp engine.DataResponse
 
 	err = json.Unmarshal(msgSendEngines.Body, &engineResp)
 	if err != nil {
@@ -161,15 +154,11 @@ func (u *Usacase) GetUserEngines(clientID int, carID string) {
 		return
 	}
 
-	carEngineResp := &engine.ForCar{
-		ID:     carID,
-		Engine: engineResp.Data,
+	userEnginesResp := &user.UserEnginesResponse{
+		ID:      userResp.Data.ID,
+		Name:    userResp.Data.Name,
+		Engines: engineResp.Data,
 	}
-	// userEnginesResp := &user.UserEnginesResponse{
-	// 	ID:      userDataResp.Data.ID,
-	// 	Name:    userDataResp.Data.Name,
-	// 	Engines: engineResp.Data,
-	// }
 
-	client.Send <- &util.Response{Data: carEngineResp}
+	client.Send <- &util.Response{Data: userEnginesResp}
 }
